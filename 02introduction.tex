@@ -1,0 +1,33 @@
+\section{Introduction}
+\label{sec:intro}
+
+Software-Defined Networking (SDN) is a paradigm for the development of research in computer networks that has gained the attention of the scientific community and industry in the area. SDN is a paradigm that separates the control plane from the data plane and allows the administrator to program the devices~\cite{ProgrammableNetworks2015}. In SDN, the control plane configures the routing rules of the network with a logically centralized entity called controller, while the data plane forwards the packets according to the actions defined by this controller. Due to the structure that SDN provides, research areas such as traffic engineering, quality of service (QoS), and virtualization have evolved rapidly~\cite{stubbe2017p4}.
+
+The OpenFlow~\cite{McKeown:2008:OpenFlow} standard is an example of SDN, which has seen significant growth since its first release in 2008 until the release of the current version (1.5)~\cite{ChristianSurveySDN2015}. The first version of OpenFlow had a matching table of ten fields and evolved into multiple tables with 44 different fields~\cite{ChristianSurveySDN2015}. However, the number of fields supported by OpenFlow is constantly being updated to support new fields and protocols, such as the IPv6 protocol. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and protocols~\cite{Jouet:2017:BPFabric}.
+
+A protocol-independent switch is a device that does not have the protocol specification a priori. It does not know how to process a specific protocol until the programmer tells how to do it. The switch works as a substrate to process packets but it is not tied to a given protocol. Protocol-independent switch enables including recent protocols such as NVGRE~\cite{rfc7637}, VxLAN~\cite{mahalingam2013}, STT~\cite{davie2014stt}, PBB~\cite{kishjac-bmwg-evpntest-08}, OTV~\cite{hasmit-otv-04}, GENEVE~\cite{ietf-nvo3-geneve-05}, and NSH~\cite{rfc8300} without hardware modification.
+% It also permit to customize what protocols to process. For instance, Amazon Virtual Private Cloud (VPC) was reported to only performs unicast IPv4 forwarding~\cite{Amazon2013Pepelnjak}. Thus, data center providers can benefit from protocol-independent switches by customizing only the necessary protocols they need for packet processing.
+
+PISCES~\cite{Shahbaz:2016:Pisces} is a software protocol-independent switch that overcomes some of the OpenFlow limitations by permitting relational comparison with >, <, and logical operator and. The P4-to-OVS compiler in PISCES outputs C source code that replaces
+the parsing, match, and action code in OVS~\cite{Pfaff:2015:OpenVSwitch}. But, to change the functionality of the switch, PISCES requires to recompile the software switch and reinstall it.
+
+Moreover, hardware devices give the impression of being inflexible since their components are hard-coded and hard-placed. We address the following question: Is it possible to design a programmable protocol-independent hardware switch that enables to modify the parsing, matching, and actions at runtime? 
+
+%\textcolor{blue}{Add eBPF explanation}
+
+This work proposes eBPFlow, a switch implemented in hardware, that allows the utilization of new dynamically defined fields and protocols, without the need to recompile or restart the switch when the user changes at run time how the flows should be processed. 
+eBPFlow leverages eBPF (enhanced Berkeley Packet Filter), a bytecode machine and protocol independent instruction set. % to define parsing, matching, and functionalities of the data plane.
+The switch was prototyped on the NetFPGA SUME 40 Gb/s~\cite{SUME2014} platform. The tests were performed in a real environment. eBPFlow allows to parse, match, and make actions in the data plane at runtime with zero downtime.
+
+%\textcolor{blue}{vantagem de zero downtime}
+Zero downtime is important to provide services without interruptions.
+Google~\cite{Jain:2013:BEG:2486001.2486019} reported a substantial outage when doing maintenance. In  Amazon's platform Dynamo~\cite{DeCandia:2007:DAH:1294261.1294281},  services have stringent requirements to meet the customer's Service Level Agreements (SLA).
+An outage can mean lost of money for not providing the service or even real lost sales on e-commerce sites.
+
+
+
+The main contributions of this work are: (i) to permit the use of new dynamically defined fields and protocols without the need to recompile or restart the switch when the user changes at run time how the flows are to be processed; (ii) processing protocol-independent network flows using eBPF instructions generated from user-created C or P4 language programs; (iii) logic design and implementation of eBPFlow, a network hardware switch that includes the eBPF processor. Our system allows changing the parse, matching, and actions at run time with zero downtime. We emphasize that all these contributions together are not possible in other systems, such as BPFabic~\cite{Jouet:2017:BPFabric}, PISCES~\cite{Shahbaz:2016:Pisces}, P4FPGA~\cite{p4fpga}, RMT~\cite{bosshart2013forwarding}, and dRMT~\cite{chole2017drmt}. 
+
+This paper is organized as follows. In \textsection\ref{sec:architecture}, we present the overall architecture of eBPFlow. In \textsection\ref{sec:design}, we provide the eBPFlow switch design. In \textsection\ref{sec:implementation}, we describe the implementation details of the eBPFlow switch at the NetFPGA platform. In \textsection\ref{sec:results}, we show the evaluation and results in a realistic environment. 
+In \textsection\ref{sec:discussion}, we provide some analysis and discuss some limitations.
+In \textsection\ref{sec:relatedWork}, we describe and compare the related work. Finally, in \textsection\ref{sec:conclusion}, we present the conclusion and future work.

@@ -1,0 +1,201 @@
+\section{Architecture}
+\label{sec:architecture}
+
+ \begin{figure}[!htp]
+ \centering
+% \includegraphics[width=.8\linewidth]{figures/Arquitetura2Crop.pdf}
+\includegraphics[width=.8\linewidth]{figures/03_fig01.png}
+ \caption{Architecture overview.}
+ \label{fig:03architecture}
+ \end{figure}
+
+Figure~\ref{fig:03architecture} provides an overview of the architecture.
+The architecture has a logically centralized controller that communicates through a socket with the network elements (routers and switches). 
+Between the controller and the switch, there is a southbound API that allows the controller to send platform-independent programs.
+
+The controller can install programs in the data plane of the network elements at run time without network interruption (zero downtime).
+The advantage of this approach is that the parser, matching, and actions can be modified at runtime.
+
+%\subsection{Dataplane}
+
+When designing the data plane, it should consider performance and how generic it is. It must be fast to be able to process the packets, presenting good network performance. Moreover,
+the set of instructions must be generic to allow the implementation of various functionalities.
+
+Our system has a generic packet processor, with no pre-established behavior.
+The behavior of the switch is defined by the set of instructions that accesses the packet headers, payload, and does the parser, matching, and actions at runtime.
+The system uses the eBPF packet processor.
+
+\subsection{eBPF}
+
+%cBPF
+Berkeley Packet Filter (BPF)\cite{McCanne:1993:BPF:1267303.1267305}, now referred as classic BPF (cBPF), is a "virtual machine" (called "pseudo-machine" originally) with a well-defined instruction set, which works as a low-level bytecode, conceptually similar to Java Virtual Machine (JVM) bytecode. It is used for packet filtering. Libpcap is an example of a library that uses BPF and is present at tcpdump and wireshark tools.
+
+
+
+%eBPF
+eBPF (enhanced BFP) is an improvement of BPF in which the architecture has been expanded from 32 to 64 bits, increased the number of write registers from 2 to 10, and added support for table operations and function calls~\cite{eBPF}.
+Whereas BPF has only forward jumps, eBPF can have backwards and forwards jumps.
+The Linux kernel, since version 3.18, allows userspace programs to install eBPF programs into the kernel. 
+EBPF allows designing architectures independent of platforms or protocols.
+No prior knowledge of the protocol or packet structure is required. 
+To parse a packet, it is loaded into the eBPF data memory. The execution of the eBPF instructions moves the packet fields into registers and makes the necessary comparisons.
+
+\begin{comment}
+\begin{figure*}[ht]
+\centering
+\includegraphics[width=.8\textwidth]{figures/06_fig01.png}
+\caption{switch datapath implemented in NetFPGA SUME.}
+\label{fig:06_fig01}
+\end{figure*}
+\end{comment}
+
+%expressiveness
+eBPF provides more expressiveness than OpenFlow.
+OpenFlow matching structure has some limitations.
+It is unable to do inequality, complement (not operation), or range matching~\cite{Jouet2015OpenFlow}. 
+For instance, it can not do logical operations such as $\geq$ or $<$, which are needed for range expressions. 
+If it needs a negation rule, for example, a match on a flow that is not on destination port 80 (web traffic), it needs to create rules for the other complement values. 
+On the other hand, eBPF can express all these cases.
+Moreover, OpenFlow switch can not extract Time-To-Live (TTL) or TCP Sequence Number fields, which are important to detect expiring packets and TCP migration, respectively. 
+The OpenFlow solution to extract fields that are not part of the OpenFlow standard is to do it at the OpenFlow controller. 
+On the other hand, an eBPF program containing only 6 instructions for each field can extract them.
+
+%Top-of-Rack switches allows for approximately ~2000 OpenFlow flow entries.
+
+
+%Table
+In the software implementation of eBPF in the Linux Kernel, it can register a set of functions to handle maps, which is a < key; value > data structure. 
+The most important functions are: create, lookup, update, and delete.
+The eBPF program can invoke these functions executing the eBPF call instruction.
+The types of maps include arrays, hashmaps, hashmaps with Least Recently Used (LRU) replacement policy, and, as of version 4.11, longest-prefix match (LPM) using trie.
+These maps allow eBPF programs to keep state between packet arrivals.
+In classic switches, layer 2 switch uses a hashmap lookup map to map the port associated with a MAC address.
+IP routing maps the port associated to the destination IP with the LPM map.
+Maps are important to store states.
+In our hardware implementation, our design choice is to use hardware modules. The maps are content-addressable memory (CAM) for exact-matching, ternary content-addressable memory (TCAM) for LPM, and Dynamic Random Access Memory (DRAM) for arrays.
+
+
+In this work, we propose to use the eBPF instruction set to parse, match, and define actions on the data plane.
+
+\subsection{High-Level Languages}
+
+
+High-level languages can be used to write code to the data plane and compile it into the eBPF instruction set. A subset of C already exists, which excludes some external libraries, system calls, and pointer arithmetic while providing functions for defining and manipulating tables. The LLVM 3.9 compiler has a backend for the eBPF platform, allowing programming in this subset of C and generating executable code in eBPF format.
+
+It is also possible to generate eBPF instructions through specific domain languages, such as P4~\cite{Bosshart:2014:P4}.
+There are efforts of the open source Iovisor project~\cite{IOvisor} that have already implemented a partial compiler from P4 to eBPF~\cite{P42EBPF2015}.
+
+\begin{figure}[htb]
+\centering
+%\includegraphics[width=1.\linewidth]{figures/sequenceNumber.pdf}
+\includegraphics[width=1.\linewidth]{figures/seqnum.pdf}
+\caption{Example of a C program that accesses the TCP sequence number. This is not possible at the OpenFlow switch.}
+\label{fig:seqnum}
+\end{figure}
+
+Figure~\ref{fig:seqnum} illustrates an example of a field that can not be extracted at the OpenFlow switch but can be executed by eBPFlow: to analyze the TCP segment and access the sequence number.
+The code example, written in the subset of C, verifies that if it is an Ethernet frame that has an IP packet and contains a TCP segment. It then accesses the value of the TCP sequence number field. Dysco~\cite{Zave:2017:DSC:3098822.3098827} is an example of a system that provides a session protocol that requires the TCP sequence number.
+
+% An important detail is that the LLVM compiler generates an executable in the executable and link format (ELF). This format has multiple segments for code execution. For our application, only the eBPF instruction set is required. The objdump tool allow to extract only the .text segment that has the instruction set. The controller installs this segment into the switch, which will execute these instructions.
+
+
+% \begin{figure}[htb]
+% \centering
+% \includegraphics[width=.3\textwidth]{imagens/04_fig02.png}
+% \caption{Diagrama de instalação das instruções eBPF no Switch/Roteador.}
+% \label{fig:04_fig02}
+% \end{figure}
+
+\subsection{Acyclic Control Flow Graph}
+%verifier
+%There exits a verifier for programs with eBPF instructions.
+The Linux kernel implementation provides an implementation of an eBPF verifier.
+The verifier lets check the validity, security, and performance of eBPF programs.
+If desired, the verifier allows eBPF programs with only bound-loops to enable static analysis.
+The eBPF verifier checks whether a program terminates, whether the memory accesses are in the range of memory space, and the greatest depth of the execution path (critical-path).
+This critical-path can provide an upper-bound on the execution time.
+The verifier enables to provide eBPF kernel-safe code execution.
+In eBPFlow, the verifier can be used after the code has been compiled and before loading it into the data plane.
+
+\begin{figure}[htb]
+\centering
+%\includegraphics[width=.8\linewidth]{figures/eBPF_Acyclic_Control_Flow_Graph-_SeqNum3.pdf}
+\includegraphics[width=.8\linewidth]{figures/eBPFACFG.pdf}
+\caption{eBPF Acyclic Control Flow Graph for the TCP sequence number example.}
+\label{fig:acfg}
+\end{figure}
+
+If the eBPF program has no backwards jump or just bound-loops (so loop unrolling can be applied), then the eBPF program can be synthesized into a directed Acyclic Control Flow Graph (ACFG). 
+Figure~\ref{fig:acfg} shows the ACFG for the TCP sequence number example presented in Figure~\ref{fig:seqnum}. Each ACFG node contains one or more eBPF instructions. Instruction ending with the letter i indicates that the instruction uses an immediate value.
+
+The conditional jump nodes are the nodes that contain two output lines and light gray background.
+Solid line indicates the next ACFG node. Dotted line indicates a jump to another ACFG node.
+In our example, the conditional jump nodes contain the jump not equal (jnei) instruction.
+The last number of the jnei instruction indicates how many instructions to jump when the condition is valid.
+
+To better understand the eBPF program, let us explain that register r1 starts with a pointer to the packet and metadata (which we explain in Section~\ref{sec:metadata}) stored in the data memory and register r0 stores the return value.
+
+In the first node, load byte instructions extract the bytes 26 and 27 from the data memory.
+Given that the metadata has 16 bytes, this represents bytes 10 and 11 of the packet (counting from 0), which is the Ethernet type field. Then, a byte swap is done to set the endiness. 
+First jump instruction compares if the Ethernet type is 0x0800. Next, the IP protocol field is extracted from the IPv4 packet and checks if it is the TCP protocol (value 6). Finally, the TCP sequence number is extracted and placed in the return register (r0). The last instruction tells that the code terminates.
+ACFG is useful to determine the worst-case execution time.
+
+
+
+
+After presenting this example, we can better contextualize the general idea presented in  Figure~\ref{fig:03architecture}. In this scenario, the network manager writes a program in C (Figure~\ref{fig:seqnum}) or P4 language, and then compiles to eBPF (Figure~\ref{fig:acfg}). The eBPF program might be checked before installation with the eBPF verifier. The eBPF program is then installed on the switch through the controller.
+
+%O roteador executa essas instruções para cada pacote recebido, permitindo um plano de dados com análise, casamento e ações dinâmicas.
+
+\subsection{Self-Populate}
+\label{sec:selfpopulate}
+
+eBPF enables to decouple code and state.
+States are stored using maps.
+The code is used to parse the packet.
+For a matching, the code executes logical expressions and calls maps to query, for example, the next hop given the destination IP.
+For actions, the code can modify the packet and indicates to where the packet should be forwarded.
+
+Given this decoupling, the eBPFlow switch can self-populate the tables. The eBPF instruction can call the maps functions to insert, delete, or update the tables. This is not possible with current P4 or OpenFlow standard where
+the controller is responsible for making
+all the forwarding decision, resulting in additional 
+network traffic, latency, and controller overload.
+Moreover, if desired, the controller can query the content of the tables anytime, 
+%or be notified when a table entry is  modified, 
+ thus, still having the knowledge of the entire network.
+
+
+\subsection{Southbound API}
+\label{sec:southboundAPI}
+
+\begin{table}[htp]
+\centering
+\caption{Messages exchange between controller and switch.}
+\label{tab:06_mes}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Type of message} &  \textbf{Description}                                    \\ \hline
+Hi                        &  Establish\\
+                          &  communication                                                                                                   \\ \hline
+Install                  &  Install  eBPF\\
+                         &  instruction on the switch                                                                                       \\ \hline
+%Notificação               & roteador $\rightarrow$  controlador                 & \begin{tabular}[c]{@{}c@{}}Roteador envia os dados lidos dos \\ registradores do hardware \\ para controlador\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Table \\ command\end{tabular}  & \begin{tabular}[c]{@{}c@{}}Controller send command\\ (update, delete, lookup, list) to switch\end{tabular}               
+\\ \hline
+Packet In/Out                  &  Sends a packet to/from\\
+                               &  switch from/to controller                                                                                       
+\\ \hline
+
+\end{tabular}
+\end{table}
+
+The controller and switch communicate via socket. After establishing the communication, both controller and switch can exchange messages with specific information. Table~\ref{tab:06_mes} displays the supported messages between controller and switch.
+
+The first message sent after the communication is established is the "Hi" message. 
+This message is sent to verify that the controller is connected to the switch and to obtain its datapath identification number. 
+The message "Install" contains the eBPF instructions that will be installed in the instruction memory of the eBPF processor. 
+The message "Table" contains commands for the tables in the switch. It can update, delete, lookup, or list the content of the table. This is similar to OpenFlow when installing or removing a rule.
+Packet\_in and Packet\_out messages are similar to OpenFlow. The switch can ask the controller to make the decision about the packet and the controller can return a modified packet.
+% "Notify" and "list tables" messages are used to capture information processed in the hardware, for example, the number of packets trafficked.
+
+
