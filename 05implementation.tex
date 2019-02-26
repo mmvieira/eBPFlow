@@ -120,6 +120,15 @@ As a design decision, we have put the instruction memory outside of the eBPF pro
 
 \subsection{Maps}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.\linewidth]{figures/coprocessor.png}
+\caption{Coprocessor and Maps table.}
+\label{fig:coproc}
+\end{figure}
+
+\ref{fig:coproc}
+
 eBPF Linux kernel implementation allows for maps. Maps are a generic data structure that store different types of data in the form of key-value pairs. 
 % Currently, the Linux Kernel allows for three different types of maps. Hash map applies a hash before inserting in the table. Array map accesses the table with an integer index. Program array map is used to store a program. eBPF programs can manipulate maps through specific kernel function calls, such as bpf\_map\_lookup\_elem().
 
