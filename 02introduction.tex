@@ -13,6 +13,13 @@ the parsing, match, and action code in OVS~\cite{Pfaff:2015:OpenVSwitch}. But, t
 
 Moreover, hardware devices give the impression of being inflexible since their components are hard-coded and hard-placed. We address the following question: Is it possible to design a programmable protocol-independent hardware switch that enables to modify the parsing, matching, and actions at runtime? 
 
+ \begin{figure}[!htp]
+ \centering
+\includegraphics[width=.8\linewidth]{figures/"eBPFlow Design Space".pdf}
+ \caption{Design Space}
+ \label{fig:03architecture}
+ \end{figure}
+
 %\textcolor{blue}{Add eBPF explanation}
 
 This work proposes eBPFlow, a switch implemented in hardware, that allows the utilization of new dynamically defined fields and protocols, without the need to recompile or restart the switch when the user changes at run time how the flows should be processed. 
