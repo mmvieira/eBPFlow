@@ -3,6 +3,13 @@
 
 Software-Defined Networking (SDN) is a paradigm for the development of research in computer networks that has gained the attention of the scientific community and industry in the area. SDN is a paradigm that separates the control plane from the data plane and allows the administrator to program the devices~\cite{ProgrammableNetworks2015}. In SDN, the control plane configures the routing rules of the network with a logically centralized entity called controller, while the data plane forwards the packets according to the actions defined by this controller. Due to the structure that SDN provides, research areas such as traffic engineering, quality of service (QoS), and virtualization have evolved rapidly~\cite{stubbe2017p4}.
 
+ \begin{figure}[!htp]
+ \centering
+\includegraphics[width=.8\linewidth]{figures/"eBPFlow Hierarchical Languages".pdf}
+ \caption{Design Space}
+ \label{fig:Language}
+ \end{figure}
+ 
 The OpenFlow~\cite{McKeown:2008:OpenFlow} standard is an example of SDN, which has seen significant growth since its first release in 2008 until the release of the current version (1.5)~\cite{ChristianSurveySDN2015}. The first version of OpenFlow had a matching table of ten fields and evolved into multiple tables with 44 different fields~\cite{ChristianSurveySDN2015}. However, the number of fields supported by OpenFlow is constantly being updated to support new fields and protocols, such as the IPv6 protocol. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and protocols~\cite{Jouet:2017:BPFabric}.
 
 A protocol-independent switch is a device that does not have the protocol specification a priori. It does not know how to process a specific protocol until the programmer tells how to do it. The switch works as a substrate to process packets but it is not tied to a given protocol. Protocol-independent switch enables including recent protocols such as NVGRE~\cite{rfc7637}, VxLAN~\cite{mahalingam2013}, STT~\cite{davie2014stt}, PBB~\cite{kishjac-bmwg-evpntest-08}, OTV~\cite{hasmit-otv-04}, GENEVE~\cite{ietf-nvo3-geneve-05}, and NSH~\cite{rfc8300} without hardware modification.
@@ -17,8 +24,10 @@ Moreover, hardware devices give the impression of being inflexible since their c
  \centering
 \includegraphics[width=.8\linewidth]{figures/"eBPFlow Design Space".pdf}
  \caption{Design Space}
- \label{fig:03architecture}
+ \label{fig:Comparison}
  \end{figure}
+
+
 
 %\textcolor{blue}{Add eBPF explanation}
 

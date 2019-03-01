@@ -18,7 +18,11 @@ To the best of our knowledge, eBPFlow is the only hardware switch that can dynam
 Protocol Oblivious Forwarding (POF)~\cite{Song:2013:POF:2491185.2491190} from Huawei describes a protocol-independent programmable SDN switch. POF defines a generic flow instruction set (FIS) to search and extract keys from the header fields and also modifying packets and updating match tables. NetASM~\cite{Shahbaz:2015:NetASM} defines an instruction set with 23 instructions and provides an intermediate representation for programmable data planes. It can be used as the target language for virtual switches and line-rate  switches. 
 
 % DPDK, NetMap
-\textbf{Packet I/O.}   Data Plane Development Kit (DPDK) framework~\cite{DPDK2018} is a set of packet I/O libraries that consumes CPU cores for fast packet processing. Following the same direction, NetMap~\cite{rizzo2012netmap} is an API that enhances access to network packets by user space applications. Those solutions are not transparent, thus requiring from the network programmer knowledge about the implementation details. 
+\textbf{Packet I/O.}   Data Plane Development Kit (DPDK) framework~\cite{DPDK2018} is a set of packet I/O libraries that consumes CPU cores for fast packet processing. 
+eXpress Data Path (XDP)~\cite{Hoiland-Jorgensen:2018:EDP:3281411.3281443} bypass the kernel for fast software packet processing.
+XDp allows to execute BFP programs inside the Linux kernel.
+Following the same direction, NetMap~\cite{rizzo2012netmap} is an API that enhances access to network packets by user space applications.
+%Those solutions are not transparent, thus requiring from the network programmer knowledge about the implementation details. 
 
 
 % OvS, Pisces
