@@ -1,6 +1,13 @@
 \begin{abstract}
-The OpenFlow standard is the most used solution in SDN, separating the data plane from the control plane and using a limited set of fields and actions. However, OpenFlow does not allow to include new fields outside the specification, making it difficult to adopt new protocols and services. In this work, we propose eBPFlow, a hardware-implemented switch that enables the use of dynamically defined new fields and protocols, without the need to recompile or restart the switch when the user changes, at run time, how the flows should be processed. eBPFlows run an eBPF (enhanced Berkeley Packet Filter) processor that enables the processing of protocol-independent network flows using eBPF instructions generated from programs created by the user written in high-level languages, such as C or P4 language . Our prototype was implemented on the NetFPGA SUME 40 Gb/s platform. We show the feasibility of building a complete hardware switch, including the eBPF engine. 
+%The OpenFlow standard is the most used solution in SDN, separating the data plane from the control plane and using a limited set of fields and actions. However, OpenFlow does not allow to include new fields outside the specification, making it difficult to adopt new protocols and services.
+Providing an expressiveness (Turing-Complete) abstraction for network function packet processing in hardware remains a research challenge. 
+In this work, we propose eBPFlow, a hardware-implemented packet processing that is Turing-Complete. It enables to program stateful and stateless network functions.
+It also enables the use of dynamically defined new fields and protocols, without the need to recompile or restart the hardware platform when the user changes, at run time, how the flows should be processed. 
+eBPFlows run an eBPF (enhanced Berkeley Packet Filter) processor that enables the processing of protocol-independent network flows using eBPF instructions generated from programs created by the user written in high-level languages.
+Our prototype was implemented on the NetFPGA SUME 40 Gb/s platform.
+We show the feasibility of building network functions, such as learning switch, load balancers, and cryptography function. 
 Our results show that the system allows modifying parsing, matching, and actions at run time with zero downtime.
+eBPFlow implementation is publicly available.
 \end{abstract}
 
 %As an initial instance, we measure the throughput for different packet sizes in a real-world environment. 
