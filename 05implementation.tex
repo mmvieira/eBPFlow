@@ -111,10 +111,33 @@ Thus, we design an eBPF processor with a pipeline of 5 stages.
 
 \subsection{Instruction Memory} 
 
-The eBPF instructions define the behavior of how the eBPF processor handles the packets. The instructions are inserted into the instruction memory via the NetFPGA register interface. Software registers were created to insert the eBPF instructions into the processor instruction memory. The instructions are received on the switch through messages sent by the controller. The instructions are then written to the software registers and forwarded to instruction memory via the hardware PCI bus.
+%The eBPF instructions define the behavior of how the eBPF processor handles the packets. The instructions are inserted into the instruction memory via the NetFPGA register interface. Software registers were created to insert the eBPF instructions into the processor instruction memory. The instructions are received on the switch through messages sent by the controller. The instructions are then written to the software registers and forwarded to instruction memory via the hardware PCI bus.
 
+%As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors in the future using a shared instruction memory. By increasing the number of eBPF processors in the datapath of the switch, more packets can be processed, contributing to the increase in the switch's throughput.
+
+The eBPF instructions define the behavior of how the eBPF processor handles the packets. The instructions are inserted into the instruction memory via the NetFPGA register interface. Software registers were created to insert the eBPF instructions into the processor instruction memory. The instructions are received on the switch through messages sent by the controller. The instructions are then written to the software registers and forwarded to instruction memory via the hardware PCI bus. 
+
+Instruction memory uses a double buffer system - DBS (Figure~\ref{fig:mem_db}) to provide zero downtime in the change of eBPF programs. This system is composed of two memories (M1 and M2). Both memories never assume the same state (writing or reading) at the same time. It means that while eBPF program written to a memory, the eBPF processor reads the instructions of another memory. DBS is initialized with eBPF instructions written on M1, while M2 will remain idle. The system remains in the wait state until a new set of instructions will be received. After the instructions are written to M1, the system will return to the standby state. When a new set of instructions are received, the memories will have their states changed, which means that M1 will no longer be written and will be read while M2 will be written. If a new instruction set is received, these instructions are written in M2, while the instructions previously written in M1 are read and processed by the eBPF processor. This process is repeated indefinitely until the arrived of another instruction set. 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/memory_db.png}
+\caption{Instruction memory - Double Buffer System.}
+\label{fig:mem_db}
+\end{figure}
 
 As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors in the future using a shared instruction memory. By increasing the number of eBPF processors in the datapath of the switch, more packets can be processed, contributing to the increase in the switch's throughput.
+
+
+\begin{comment}
+%The eBPF instructions define the way in which the eBPF processor will process the packages. Instruction memory was implemented with a double buffer system in order to provide zero downtime in the prototype through important changes, such as sudden changes in the packet processing pattern. 
+
+%The implementation of the double buffer memory started from the following design decision: the memories involved, M1 and M2, will never assume the same state (of writting or reading) at the same time. It means that while data is written to a memory, data is read from the other one and vice versa. 
+%From this definition, we implemented an efficient management system that works as follows: the first memory to be written will always be M1, while M2 will remain idle. 
+%The system remains in the wait state until a new set of instructions is received. Writing in M1 is initiated when a set of instructions is received. 
+%Once all instructions are written to M1, the system will return to the standby state. When a new set of instructions is received, the memories will have their states changed, what means that M1 will no longer be written and will be read while M2 will be written. The new instruction set is then written in M2, while the instructions previously written in M1 are read and processed by the eBPF processor. This process is repeated indefinitely until the instruction sets are no longer received. In this case, the last written memory has its state maintained, that is, the state of write and read of the memories is only changed upon receipt of a new set of instructions. 
+\end{comment}
+
 
 
 
