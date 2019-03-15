@@ -3,14 +3,20 @@
 
 Software-Defined Networking (SDN) is a paradigm for the development of research in computer networks that has gained the attention of the scientific community and industry in the area. SDN is a paradigm that separates the control plane from the data plane and allows the administrator to program the devices~\cite{ProgrammableNetworks2015}. In SDN, the control plane configures the routing rules of the network with a logically centralized entity called controller, while the data plane forwards the packets according to the actions defined by this controller. Due to the structure that SDN provides, research areas such as traffic engineering, quality of service (QoS), and virtualization have evolved rapidly~\cite{stubbe2017p4}.
 
- \begin{figure}[!htp]
- \centering
-\includegraphics[width=.6\linewidth]{figures/"eBPFlowHierarchicalLanguages".pdf}
- \caption{Expressiveness}
- \label{fig:Language}
- \end{figure}
+
  
-The OpenFlow~\cite{McKeown:2008:OpenFlow} standard is an example of SDN, which has seen significant growth since its first release in 2008 until the release of the current version (1.5)~\cite{ChristianSurveySDN2015}. The first version of OpenFlow had a matching table of ten fields and evolved into multiple tables with 44 different fields~\cite{ChristianSurveySDN2015}. However, the number of fields supported by OpenFlow is constantly being updated to support new fields and protocols, such as the IPv6 protocol. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and protocols~\cite{Jouet:2017:BPFabric}.
+% The OpenFlow~\cite{McKeown:2008:OpenFlow} standard is an example of SDN, which has seen significant growth since its first release in 2008 until the release of the current version (1.5)~\cite{ChristianSurveySDN2015}. The first version of OpenFlow had a matching table of ten fields and evolved into multiple tables with 44 different fields~\cite{ChristianSurveySDN2015}. However, the number of fields supported by OpenFlow is constantly being updated to support new fields and protocols, such as the IPv6 protocol. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and protocols~\cite{Jouet:2017:BPFabric}.
+
+\begin{figure}[!htp]
+\centering
+\includegraphics[width=.6\linewidth]{figures/"eBPFlowHierarchicalLanguages".pdf}
+\caption{Expressiveness}
+\label{fig:Language}
+\end{figure}
+
+Figure~\ref{fig:Language} presents the expressiveness of current designs. The first version of OpenFlow~\cite{McKeown:2008:OpenFlow} standard had a matching table of ten fields and evolved into multiple tables with 44 different fields in the release of version (1.5)~\cite{ChristianSurveySDN2015}. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and 
+protocols~\cite{Jouet:2017:BPFabric}.
+P4~\cite{Bosshart:2014:P4} provides a programmable parser, enabling to match new fields. P4 follows the match-action abstraction model where network functions are described as a pipeline of a programmable parser and stages of match and action components. P4-16 provides a primitive to store state using small registers but this is too restrict for large range of stateful functions. FlowBaze~\cite{FlowBlaze2019} allows stateful packet processing in hardware by programming using Extended Finite State Machines (EFSM). \marcos{improve description of eBPF-v and eBPF.} eBPF-verifier is the set of eBPF programs that passes the eBPF-verifier. The verifier does not allow backward jumps, thus, loops have to be unrolled. eBPF and x86 instructions provide Turing-Complete execution model.
 
 A protocol-independent packet processor is a device that does not have the protocol specification a priori. It does not know how to process a specific protocol until the programmer tells how to do it. The packet processor works as a substrate to process packets but it is not tied to a given protocol. Protocol-independent packet processor enables including recent protocols such as NVGRE~\cite{rfc7637}, VxLAN~\cite{mahalingam2013}, STT~\cite{davie2014stt}, PBB~\cite{kishjac-bmwg-evpntest-08}, OTV~\cite{hasmit-otv-04}, GENEVE~\cite{ietf-nvo3-geneve-05}, and NSH~\cite{rfc8300} without hardware modification.
 % It also permit to customize what protocols to process. For instance, Amazon Virtual Private Cloud (VPC) was reported to only performs unicast IPv4 forwarding~\cite{Amazon2013Pepelnjak}. Thus, data center providers can benefit from protocol-independent switches by customizing only the necessary protocols they need for packet processing.
@@ -27,7 +33,8 @@ Moreover, hardware devices give the impression of being inflexible since their c
  \label{fig:Comparison}
  \end{figure}
 
-
+Figure~\ref{fig:Comparison} compares the design space.
+\marcos{Need to finish descrption of figure here}
 
 %\textcolor{blue}{Add eBPF explanation}
 
@@ -42,7 +49,12 @@ An outage can mean lost of money for not providing the service or even real lost
 
 
 
-The main contributions of this work are: (i) to permit the use of new dynamically defined fields and protocols without the need to recompile or restart the device when the user changes at run time how the flows are to be processed; (ii) processing protocol-independent network flows using eBPF instructions generated from user-created C or P4 language programs; (iii) logic design and implementation of eBPFlow, a network hardware packet processor that includes the eBPF processor. Our system allows changing the parse, matching, and actions at run time with zero downtime. We emphasize that all these contributions together are not possible in other systems, such as BPFabic~\cite{Jouet:2017:BPFabric}, PISCES~\cite{Shahbaz:2016:Pisces}, P4FPGA~\cite{p4fpga}, RMT~\cite{bosshart2013forwarding}, and dRMT~\cite{chole2017drmt}. 
+The main contributions of this work are: 
+(i) logic design and hardware implementation of eBPFlow, built on top of the NetFPGA SUME that can forward packets at 40 Gb/s line rate.
+(ii) \system enables the programming of stateful and stateless network functions and the use of dynamically defined new fields and protocols, with zero downtime when the user changes, at run time, how the flows should be processed.
+(iii) a comprehensive study of \system expressiveness and capabilities through the implementation of many network function cases.\marcos{describe what are the network functions here}
+
+We emphasize that all these contributions together are not possible in other systems, such as BPFabic~\cite{Jouet:2017:BPFabric}, PISCES~\cite{Shahbaz:2016:Pisces}, P4FPGA~\cite{p4fpga}, RMT~\cite{bosshart2013forwarding}, and dRMT~\cite{chole2017drmt}. 
 
 This paper is organized as follows. In \textsection\ref{sec:architecture}, we present the overall architecture of eBPFlow. In \textsection\ref{sec:design}, we provide the eBPFlow packet processor. In \textsection\ref{sec:implementation}, we describe the implementation details of eBPFlow built on top of the NetFPGA SUME platform. In \textsection\ref{sec:results}, we show the evaluation and results in a realistic environment. 
 In \textsection\ref{sec:discussion}, we provide some analysis and discuss some limitations.

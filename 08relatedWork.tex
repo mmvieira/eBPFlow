@@ -3,24 +3,28 @@
 
 %\input{08tableRelatedWork}
 
-To the best of our knowledge, eBPFlow is the only hardware switch that can dynamically modify the parser, matching, and actions at zero downtime and can also self-populate its tables.
+To the best of our knowledge, eBPFlow is the only hardware device that can dynamically modify the parser, matching, and actions at zero downtime.
+%and can also self-populate its tables.
 
 %OpenFlow standard 
-\textbf{OpenFlow standard}. The OpenFlow~\cite{McKeown:2008:OpenFlow} standard, although being the most adopted SDN architecture, has limitations. Its matching structure is unable to do inequality, complement (not operation), or range matching. OpenFlow does not support self-populating the tables. It delegates the responsibility entirely to the controller.
+\textbf{OpenFlow standard}. The OpenFlow~\cite{McKeown:2008:OpenFlow} standard, although being the most adopted SDN architecture, has limitations. Its matching structure is unable to do inequality, complement (not operation), or range matching. 
+%OpenFlow does not support self-populating the tables. It delegates the responsibility entirely to the controller.
 
 
 % P4, C, Domino
 %todo: C?
-\textbf{High level domain specific languages.} The P4 programming language P4~\cite{Bosshart:2014:P4} does not have yet support for programs that self-populate the tables. It might be a possible future improvement, which is currently limiting the design of new data plane functionalities. P4 language can be used to generate eBPF instructions using the compiler from P4 to eBPF~\cite{P42EBPF2015}. Domino~\cite{Sivaraman:2016:PTH:2934872.2934900} is a high-level language that can be compiled into Banzai, which is a low-level machine model designed for line-rate switches. 
+\textbf{High level domain specific languages.} The P4 programming language P4~\cite{Bosshart:2014:P4} adopts the match-action abstraction model. 
+%does not have yet support for programs that self-populate the tables. It might be a possible future improvement, which is currently limiting the design of new data plane functionalities.
+P4 language can be used to generate eBPF instructions using the compiler from P4 to eBPF~\cite{P42EBPF2015}. Domino~\cite{Sivaraman:2016:PTH:2934872.2934900} is a high-level language that can be compiled into Banzai, which is a low-level machine model designed for line-rate switches. 
+Although P4 and Domino include small and fast registers to store state, they provide a restricted functionally for large range of stateful functions.
 
 %- POF, NetASM
 \textbf{Intermediate level domain specific languages.} Some works(~\cite{Song:2013:POF:2491185.2491190,Shahbaz:2015:NetASM,Sivaraman:2016:PTH:2934872.2934900}) define an intermediate instruction set to improve the data plane programmability.
-Protocol Oblivious Forwarding (POF)~\cite{Song:2013:POF:2491185.2491190} from Huawei describes a protocol-independent programmable SDN switch. POF defines a generic flow instruction set (FIS) to search and extract keys from the header fields and also modifying packets and updating match tables. NetASM~\cite{Shahbaz:2015:NetASM} defines an instruction set with 23 instructions and provides an intermediate representation for programmable data planes. It can be used as the target language for virtual switches and line-rate  switches. 
+Protocol Oblivious Forwarding (POF)~\cite{Song:2013:POF:2491185.2491190} from Huawei describes a protocol-independent programmable SDN switch. POF defines a generic flow instruction set (FIS) to search and extract keys from the header fields and also modifying packets and updating match tables. NetASM~\cite{Shahbaz:2015:NetASM} defines an instruction set with 23 instructions and provides an intermediate representation for programmable data planes. It can be used as the target language for virtual switches and line-rate switches. 
 
 % DPDK, NetMap
 \textbf{Packet I/O.}   Data Plane Development Kit (DPDK) framework~\cite{DPDK2018} is a set of packet I/O libraries that consumes CPU cores for fast packet processing. 
-eXpress Data Path (XDP)~\cite{Hoiland-Jorgensen:2018:EDP:3281411.3281443} bypass the kernel for fast software packet processing.
-XDp allows to execute BFP programs inside the Linux kernel.
+eXpress Data Path (XDP)~\cite{Hoiland-Jorgensen:2018:EDP:3281411.3281443} is a kernel hook for fast software packet processing, allowing to execute BFP programs inside the Linux kernel.
 Following the same direction, NetMap~\cite{rizzo2012netmap} is an API that enhances access to network packets by user space applications.
 %Those solutions are not transparent, thus requiring from the network programmer knowledge about the implementation details. 
 
@@ -68,7 +72,7 @@ The three main components of the platform are: code generator, runtime system, a
 P4-To-VHDL~\cite{BENACEK201822} is a tool that converts a P4 description to a synthesizable VHDL code suitable for the FPGA implementation.
 %P4FPGA can not modify the parser, matching or actions at run time.
 OpenSketch~\cite{Yu:2013:SDT:2482626.2482631} also utilized NetFPGA for prototyping. They implemented a three-stage pipeline (hashing, filtering, and counting) at the data plane for network traffic measurement. Naous et al.~\cite{Naous:2008:IOS:1477942.1477944} describe the implementation of an OpenFlow Switch on the NetFPGA 1G platform. 
-FlowBaze~\cite{FlowBlaze2019} is an FPGA-based SmartNIC that allows stateful packet processing in hardware by programming using Extended Finite State Maching (EFSM). It is not Turing-complete and to change the parser, match fields, or EFSM transition tables, it requires a new synthesis.
+FlowBaze~\cite{FlowBlaze2019} is an FPGA-based SmartNIC that allows stateful packet processing in hardware by programming using Extended Finite State Machines (EFSM). It is not Turing-complete and to change the parser, match fields, or EFSM transition tables, it requires a new synthesis.
 % KeyFlow
 \textbf{Arithmetic Switch.} KeyFlow~\cite{Martinello2014KeyFlow}
 %is a system that describes a new approach to switching packets. 
