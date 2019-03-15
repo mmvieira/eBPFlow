@@ -1,11 +1,18 @@
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-A switch with an eBPF virtual machine at its core was designed and implemented in hardware on the NetFPGA platform. 
+We presented \system, a Turing-Complete hardware packet processing targeted for high-performance data plane network functions.
+A packet processing with an eBPF virtual machine at its core was designed and implemented in hardware. 
 This system allows executing parse, matching, and actions dynamically through eBPF instructions.
-The system is protocol independent and, unlike the OpenFlow standard, allows to use new fields, facilitating the adoption of new protocols and services in computer networks.
-EBPF instructions are generated from programs written in C or P4 language. 
-The system allows changing the image of the eBPF program at runtime, allowing to modify how the flows should be processed with zero downtime.
+The system is protocol independent and allows to use new fields, facilitating the adoption of new protocols and services in computer networks.
+%EBPF instructions are generated from programs written in C or P4 language. 
+The \system allows changing the image of the eBPF program at runtime, allowing to modify how the flows should be processed with zero downtime.
 
-For future work, it is desirable to place an eBPF processor for each input queue. Next step includes producing eBPFlow Application Specific Integrated Circuit (ASIC) and commercializing it.
-We envision that eBPF instructions will replace OpenFlow standard matching and eBPFlow will be used as smart NIC, switches, and routers.
+% For future work, it is desirable to place an eBPF processor for each input queue. Next step includes producing eBPFlow Application Specific Integrated Circuit (ASIC) and commercializing it.
+% We envision that eBPF instructions will replace OpenFlow standard matching and eBPFlow will be used as smart NIC, switches, and routers.
+
+\system is built on top of the NetFPGA SUME platform.
+FPGAs are useful for prototyping and validating the hardware logic design~\cite{cofer2005rapid,sukhwani2017contutto}. 
+The logic design for FPGA shares the same initial flow and methodology as Application Specific Integrated Circuit (ASIC) design~\cite{kuon07measuring,ASICDesignFlow2005}. 
+We leave eBPFlow over ASIC as future work.
+We plan to make the eBPFlow implementation publicly available.

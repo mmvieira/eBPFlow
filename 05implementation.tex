@@ -2,7 +2,7 @@
 \label{sec:implementation}
 
 In this section, we describe the implementation details of \system.
-The switch implementation consists of two components: data plane and user space tools. 
+The implementation consists of two components: data plane and user space tools. 
 The data plane was implemented in the NetFPGA SUME platform~\cite{SUME2014}.
 The user space tools are composed of a controller responsible for defining how the data plane will forward the packets, and software to configure the data plane features, according to the user-created C and P4 programs.
 
@@ -28,7 +28,7 @@ the output port lookup module.
 The output port lookup module is responsible for defining which port the packet will be sent based
 on the packet properties, for example, an input port or destination address. 
 The outgoing port of all incoming packets is configured in the metadata output port field.
-We implemented the switch functionalities in the output port lookup module.
+We implemented the device functionalities in the output port lookup module.
 
 \subsection{Finite State Machine}
 
@@ -44,7 +44,7 @@ The finite state machine (FSM) in the module output port lookup controls the who
 \end{figure*}
 
 
-The eBPF processor is responsible for performing the parse, matching, and actions according to the user-created user-generated C-code or P4-generated eBPF instructions. When starting the operation of the switch, the user must load the eBPF instructions into the instruction memory to define  the behavior of the data plane.
+The eBPF processor is responsible for performing the parse, matching, and actions according to the user-created user-generated C-code or P4-generated eBPF instructions. When starting the operation of the device, the user must load the eBPF instructions into the instruction memory to define  the behavior of the data plane.
 % After the instructions have been loaded the switch starts processing the packets.
 
 Figure~\ref{fig:06_fig02} presents the data and control path in register transfer level (RTL), containing five data functional units (program counter, instruction memory, register file, arithmetic logic unit (ALU), data memory) and three control units (hazard detection, forwarding, and control).
@@ -116,7 +116,7 @@ Thus, we design an eBPF processor with a pipeline of 5 stages.
 
 %As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors in the future using a shared instruction memory. By increasing the number of eBPF processors in the datapath of the switch, more packets can be processed, contributing to the increase in the switch's throughput.
 
-\textcolor{blue}{The eBPF instructions define the behavior of how the eBPF processor handles the packets. The instructions are inserted into the instruction memory via the NetFPGA register interface. Software registers were created to insert the eBPF instructions into the processor instruction memory. The instructions are received on the switch through messages sent by the controller. The instructions are then written to the software registers and forwarded to instruction memory via the hardware PCI bus.} 
+\textcolor{blue}{The eBPF instructions define the behavior of how the eBPF processor handles the packets. The instructions are inserted into the instruction memory via the NetFPGA register interface. Software registers were created to insert the eBPF instructions into the processor instruction memory. The instructions are received on the network element through messages sent by the controller. The instructions are then written to the software registers and forwarded to instruction memory via the hardware PCI bus.} 
 
 \textcolor{blue}{Instruction memory uses a double buffer system - DBS (Figure~\ref{fig:mem_db}) to provide zero downtime in the change of eBPF programs. This system is composed of two memories (M1 and M2). Both memories never assume the same state (writing or reading) at the same time. It means that while eBPF program written to a memory, the eBPF processor reads the instructions of another memory. DBS is initialized with eBPF instructions written on M1, while M2 will remain idle. The system remains in the wait state until a new set of instructions will be received. After the instructions are written to M1, the system will return to the standby state. When a new set of instructions are received, the memories will have their states changed, which means that M1 will no longer be written and will be read while M2 will be written. If a new instruction set is received, these instructions are written in M2, while the instructions previously written in M1 are read and processed by the eBPF processor. This process is repeated indefinitely until the arrived of another instruction set.} 
 
@@ -127,7 +127,7 @@ Thus, we design an eBPF processor with a pipeline of 5 stages.
 \label{fig:mem_db}
 \end{figure}
 
-\textcolor{blue}{As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors in the future using a shared instruction memory. By increasing the number of eBPF processors in the datapath of the switch, more packets can be processed, contributing to the increase in the switch's throughput.}
+\textcolor{blue}{As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors in the future using a shared instruction memory. By increasing the number of eBPF processors, more packets can be processed, contributing to the increase in the throughput.}
 
 
 \begin{comment}
@@ -221,11 +221,11 @@ synchronism of the modules with their respective signals. TDATA represents the d
 The user space tools are composed of the controller and applications created at the user level.
 The controller implements the Southbound API defined in Section~\ref{sec:southboundAPI}.
 It was implemented in Python.
-The controller opens a socket connection to the switch to exchange the Southbound messages.
+The controller opens a socket connection to the device to exchange the Southbound messages.
 
 The applications to execute over the controller were also implemented in Python.
 They open a connection to the controller and transmit the eBPF program, which was already compiled, as bytecodes.
-These bytecodes are installed in the switch by the controller at runtime.
+These bytecodes are installed in the network element by the controller at runtime.
 In Section~\ref{sec:experiments}, we provide examples of applications
 \color{black}
 \color{blue}

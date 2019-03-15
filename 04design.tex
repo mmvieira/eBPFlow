@@ -4,19 +4,19 @@
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=1.\linewidth]{figures/06_fig01.png}
-\caption{Switch datapath design and implementation on NetFPGA SUME.}
+\caption{Packet processor datapath design and implementation on NetFPGA SUME.}
 \label{fig:06_fig01}
 \end{figure}
 
-Figure~\ref{fig:06_fig01} gives an overview of the switch design and implementation on the NetFPGA SUME~\cite{SUME2014} platform. 
+Figure~\ref{fig:06_fig01} gives an overview of the packet processor design and implementation built on top of the NetFPGA SUME~\cite{SUME2014} platform. 
 Each box represents a module.
-The switch design is represented by the orange modules and Tables module.
+The device design is represented by the orange modules and Tables module.
 The gray modules are the hardware modules that belong to the standard NetFPGA library and are described in Section~\ref{sec:implementation}.
 
 
 \subsection{Data plane}
 
-The switch extends the NetFPGA datapath with four new hardware modules (orange): instruction memory, eBPF processor, coprocessor, and action packet. There is also a modification to the Finite State Machine (FSM) of Output Port Lookup module. The eBPF instructions generated from the user-created C and P4 codes are stored in the instruction memory. These instructions define the behavior of the data plane. The eBPF processor is responsible for performing the parse, matching, and actions using instructions stored in the instruction memory. In addition, the processor communicates with the control plane through a socket. The coprocessor handles requests to access the tables. The action module in the packet only forwards or discards the packet according to the value stored in eBPF register r0 after processing the eBPF instructions. % Further details on the implementation of the data plan are presented in the \ ac {[ref]} section.
+The packet processor extends the NetFPGA datapath with four new hardware modules (orange): instruction memory, eBPF processor, coprocessor, and action packet. There is also a modification to the Finite State Machine (FSM) of Output Port Lookup module. The eBPF instructions generated from the user-created C and P4 codes are stored in the instruction memory. These instructions define the behavior of the data plane. The eBPF processor is responsible for performing the parse, matching, and actions using instructions stored in the instruction memory. In addition, the processor communicates with the control plane through a socket. The coprocessor handles requests to access the tables. The action module in the packet only forwards or discards the packet according to the value stored in eBPF register r0 after processing the eBPF instructions. % Further details on the implementation of the data plan are presented in the \ ac {[ref]} section.
 
 \subsection{Metadata}
 \label{sec:metadata}

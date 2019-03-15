@@ -11,7 +11,7 @@
 
 Figure~\ref{fig:03architecture} provides an overview of the architecture.
 The architecture has a logically centralized controller that communicates through a socket with the network elements (routers and switches). 
-Between the controller and the switch, there is a southbound API that allows the controller to send platform-independent programs.
+Between the controller and the network elements, there is a southbound API that allows the controller to send platform-independent programs.
 
 The controller can install programs in the data plane of the network elements at run time without network interruption (zero downtime).
 The advantage of this approach is that the parser, matching, and actions can be modified at runtime.
@@ -22,7 +22,7 @@ When designing the data plane, it should consider performance and how generic it
 the set of instructions must be generic to allow the implementation of various functionalities.
 
 Our system has a generic packet processor, with no pre-established behavior.
-The behavior of the switch is defined by the set of instructions that accesses the packet headers, payload, and does the parser, matching, and actions at runtime.
+The behavior of the device is defined by the set of instructions that accesses the packet headers, payload, and does the parser, matching, and actions at runtime.
 The system uses the eBPF packet processor.
 
 \subsection{eBPF}
@@ -44,7 +44,7 @@ To parse a packet, it is loaded into the eBPF data memory. The execution of the 
 \begin{figure*}[ht]
 \centering
 \includegraphics[width=.8\textwidth]{figures/06_fig01.png}
-\caption{switch datapath implemented in NetFPGA SUME.}
+\caption{\system datapath implemented in NetFPGA SUME.}
 \label{fig:06_fig01}
 \end{figure*}
 \end{comment}
@@ -143,7 +143,7 @@ ACFG is useful to determine the worst-case execution time.
 
 
 
-After presenting this example, we can better contextualize the general idea presented in  Figure~\ref{fig:03architecture}. In this scenario, the network manager writes a program in C (Figure~\ref{fig:seqnum}) or P4 language, and then compiles to eBPF (Figure~\ref{fig:acfg}). The eBPF program might be checked before installation with the eBPF verifier. The eBPF program is then installed on the switch through the controller.
+After presenting this example, we can better contextualize the general idea presented in  Figure~\ref{fig:03architecture}. In this scenario, the network manager writes a program in C (Figure~\ref{fig:seqnum}) or P4 language, and then compiles to eBPF (Figure~\ref{fig:acfg}). The eBPF program might be checked before installation with the eBPF verifier. The eBPF program is then installed on the device through the controller.
 
 %O roteador executa essas instruções para cada pacote recebido, permitindo um plano de dados com análise, casamento e ações dinâmicas.
 
@@ -156,7 +156,7 @@ The code is used to parse the packet.
 For a matching, the code executes logical expressions and calls maps to query, for example, the next hop given the destination IP.
 For actions, the code can modify the packet and indicates to where the packet should be forwarded.
 
-Given this decoupling, the eBPFlow switch can self-populate the tables. The eBPF instruction can call the maps functions to insert, delete, or update the tables. This is not possible with current P4 or OpenFlow standard where
+Given this decoupling, the eBPFlow can self-populate the tables. The eBPF instruction can call the maps functions to insert, delete, or update the tables. This is not possible with current P4 or OpenFlow standard where
 the controller is responsible for making
 all the forwarding decision, resulting in additional 
 network traffic, latency, and controller overload.
@@ -170,7 +170,7 @@ Moreover, if desired, the controller can query the content of the tables anytime
 
 \begin{table}[htp]
 \centering
-\caption{Messages exchange between controller and switch.}
+\caption{Messages exchange between controller and network element.}
 \label{tab:06_mes}
 \begin{tabular}{|c|c|}
 \hline
@@ -178,24 +178,24 @@ Moreover, if desired, the controller can query the content of the tables anytime
 Hi                        &  Establish\\
                           &  communication                                                                                                   \\ \hline
 Install                  &  Install  eBPF\\
-                         &  instruction on the switch                                                                                       \\ \hline
+                         &  instruction on the device                                                                                       \\ \hline
 %Notificação               & roteador $\rightarrow$  controlador                 & \begin{tabular}[c]{@{}c@{}}Roteador envia os dados lidos dos \\ registradores do hardware \\ para controlador\end{tabular} \\ \hline
-\begin{tabular}[c]{@{}c@{}}Table \\ command\end{tabular}  & \begin{tabular}[c]{@{}c@{}}Controller send command\\ (update, delete, lookup, list) to switch\end{tabular}               
+\begin{tabular}[c]{@{}c@{}}Table \\ command\end{tabular}  & \begin{tabular}[c]{@{}c@{}}Controller send command\\ (update, delete, lookup, list) to device\end{tabular}               
 \\ \hline
 Packet In/Out                  &  Sends a packet to/from\\
-                               &  switch from/to controller                                                                                       
+                               & device from/to controller                                                                                       
 \\ \hline
 
 \end{tabular}
 \end{table}
 
-The controller and switch communicate via socket. After establishing the communication, both controller and switch can exchange messages with specific information. Table~\ref{tab:06_mes} displays the supported messages between controller and switch.
+The controller and device communicate via socket. After establishing the communication, both controller and network element can exchange messages with specific information. Table~\ref{tab:06_mes} displays the supported messages between controller and network element.
 
 The first message sent after the communication is established is the "Hi" message. 
-This message is sent to verify that the controller is connected to the switch and to obtain its datapath identification number. 
+This message is sent to verify that the controller is connected to the network element and to obtain its datapath identification number. 
 The message "Install" contains the eBPF instructions that will be installed in the instruction memory of the eBPF processor. 
-The message "Table" contains commands for the tables in the switch. It can update, delete, lookup, or list the content of the table. This is similar to OpenFlow when installing or removing a rule.
-Packet\_in and Packet\_out messages are similar to OpenFlow. The switch can ask the controller to make the decision about the packet and the controller can return a modified packet.
+The message "Table" contains commands for the tables in the device. It can update, delete, lookup, or list the content of the table. This is similar to OpenFlow when installing or removing a rule.
+Packet\_in and Packet\_out messages are similar to OpenFlow. The device can ask the controller to make the decision about the packet and the controller can return a modified packet.
 % "Notify" and "list tables" messages are used to capture information processed in the hardware, for example, the number of packets trafficked.
 
 
