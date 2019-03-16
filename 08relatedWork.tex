@@ -3,7 +3,7 @@
 
 %\input{08tableRelatedWork}
 
-To the best of our knowledge, eBPFlow is the only hardware device that can dynamically modify the parser, matching, and actions at zero downtime.
+To the best of our knowledge, eBPFlow is the first packet processing hardware device that is Turing-Complete, enables the programming of stateful and stateless network functions, and can dynamically modify the parser, matching, and actions at zero downtime.
 %and can also self-populate its tables.
 
 %OpenFlow standard 
@@ -84,6 +84,9 @@ KeyFlow is complementary to our system because it could be implemented in our sy
 %, SoftNIC.
 \textbf{Smart NIC} 
 SoftNIC~\cite{Han:EECS-2015-155} provides a programmable NIC interface with Click~\cite{Kohler:2000:CMR:354871.354874}. It is a different approach to provide network programmability. It provides new functionalities for host NIC through software.
+Netronome~\cite{Netronome2018} provides a SmartNIC that can be programmed with eBPF instructions. This shows the trend that eBPF is also being adopted by industry. 
+Netronome SmartNIC focuses on the L2-layer, having at most two ports, and does not provide specialized hardware modules for higher layer such as TCAMs.
+Netronome SmartNIC expressiveness can be categorized as eBPF-verifier since it needs to run the verifier and can not have backward jumps. It requires loop unrolling, which increases the number of instructions. For example, it could not fit the ChaCha20 network function. 
 
 % NPU, Xpliant, Tofino
 \textbf{Network processing units (NPUs).} NPUs~\cite{Sherwood:2003:PMA:859618.859652,Keslassy:2012:PPG:2428663.2428680} 
