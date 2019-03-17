@@ -108,6 +108,18 @@ Time to install code $=$ (number of instructions+2) $* 500 us * 2.$
 
 In the last experiment, eBPFlow starts as IPv4 router. During runtime, we install the learning switch. This experiment validates the system by showing that the switch executes these instructions for each received packet, allowing a data plane with dynamic parse, matching, and actions at run time with zero downtime.
 
+\textbf{ChaCha:} 
+ChaCha20~\cite{rfc8439} is a
+stream cipher used in Transport Layer Security (TLS) by Google for symmetric
+encryption~\cite{google-chacha}.
+ChaCha20 cannot be implemented in the P4 switch.
+The number after ChaCha indicates how many rounds to apply the cipher over the data.
+The Netronome Agilio CX 1x40 Gbps SmartNIC can only support up to 8 rounds. Netronome expressiveness can be categorized as eBPF-verifier. It requires the verifier and loop unrolling, which increases the number of instructions and thus does not fit in the smartNIC memory instruction.
+But, \system is able to execute ChaCha20.
+
+
+
+
 \subsection{Power}
 
 When idle, the NetFPGA consumes 16 W.

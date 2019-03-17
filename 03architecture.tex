@@ -10,7 +10,7 @@
 %  \end{figure}
 
 %Figure~\ref{fig:03architecture} provides an overview of the architecture.
-The \system architecture has a logically centralized controller that communicates through a socket with the network elements (routers and switches). 
+The \system architecture has a logically centralized controller that communicates through a socket with the network elements (\eg routers, switches). 
 Between the controller and the network elements, there is a southbound API that allows the controller to send platform-independent programs.
 
 The controller can install programs in the data plane of the network elements at run time without network interruption (zero downtime).
@@ -33,7 +33,7 @@ Berkeley Packet Filter (BPF)\cite{McCanne:1993:BPF:1267303.1267305}, now referre
 
 
 %eBPF
-eBPF (enhanced BFP) is an improvement of BPF in which the architecture has been expanded from 32 to 64 bits, increased the number of write registers from 2 to 10, and added support for table operations and function calls~\cite{eBPF}.
+eBPF (extended BFP) is an improvement of BPF in which the architecture has been expanded from 32 to 64 bits, increased the number of write registers from 2 to 10, and added support for table operations and function calls~\cite{eBPF}.
 Whereas BPF has only forward jumps, eBPF can have backwards and forwards jumps.
 The Linux kernel, since version 3.18, allows userspace programs to install eBPF programs into the kernel. 
 EBPF allows designing architectures independent of platforms or protocols.
@@ -83,7 +83,7 @@ In this work, we propose to use the eBPF instruction set to parse, match, and de
 High-level languages can be used to write code to the data plane and compile it into the eBPF instruction set. A subset of C already exists, which excludes some external libraries, system calls, and pointer arithmetic while providing functions for defining and manipulating tables. The LLVM 3.9 compiler has a backend for the eBPF platform, allowing programming in this subset of C and generating executable code in eBPF format.
 
 It is also possible to generate eBPF instructions through specific domain languages, such as P4~\cite{Bosshart:2014:P4}.
-There are efforts of the open source Iovisor project~\cite{IOvisor} that have already implemented a partial compiler from P4 to eBPF~\cite{P42EBPF2015}.
+There are efforts of the open source Iovisor project~\cite{IOvisor} and from VMware~\cite{p4c-xdp2018} that have already implemented a compiler from P4 to eBPF~\cite{P42EBPF2015}.
 
 % \begin{figure}[htb]
 % \centering
@@ -106,7 +106,8 @@ There are efforts of the open source Iovisor project~\cite{IOvisor} that have al
 % \label{fig:04_fig02}
 % \end{figure}
 
-\subsection{Acyclic Control Flow Graph}
+%\subsection{Acyclic Control Flow Graph}
+\subsection{eBPF verifier}
 %verifier
 %There exits a verifier for programs with eBPF instructions.
 The Linux kernel implementation provides an implementation of an eBPF verifier.
@@ -149,7 +150,8 @@ The network manager writes a program in C or P4 language, and then compiles to e
 
 %O roteador executa essas instruções para cada pacote recebido, permitindo um plano de dados com análise, casamento e ações dinâmicas.
 
-\subsection{Self-Populate}
+\subsection{Decoupling state from code}
+%\subsection{Self-Populate}
 \label{sec:selfpopulate}
 
 eBPF enables to decouple code and state.
@@ -158,13 +160,13 @@ The code is used to parse the packet.
 For a matching, the code executes logical expressions and calls maps to query, for example, the next hop given the destination IP.
 For actions, the code can modify the packet and indicates to where the packet should be forwarded.
 
-Given this decoupling, the eBPFlow can self-populate the tables. The eBPF instruction can call the maps functions to insert, delete, or update the tables. This is not possible with current P4 or OpenFlow standard where
-the controller is responsible for making
-all the forwarding decision, resulting in additional 
-network traffic, latency, and controller overload.
-Moreover, if desired, the controller can query the content of the tables anytime, 
-%or be notified when a table entry is  modified, 
- thus, still having the knowledge of the entire network.
+% Given this decoupling, the eBPFlow can self-populate the tables. The eBPF instruction can call the maps functions to insert, delete, or update the tables. This is not possible with current P4 or OpenFlow standard where
+% the controller is responsible for making
+% all the forwarding decision, resulting in additional 
+% network traffic, latency, and controller overload.
+% Moreover, if desired, the controller can query the content of the tables anytime, 
+% %or be notified when a table entry is  modified, 
+%  thus, still having the knowledge of the entire network.
 
 
 \subsection{Southbound API}
