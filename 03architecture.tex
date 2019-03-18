@@ -178,11 +178,13 @@ For actions, the code can modify the packet and indicates to where the packet sh
 \centering
 \caption{Messages exchange between controller and network element.}
 \label{tab:06_mes}
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{|c|c|}
 \hline
 \textbf{Type of message} &  \textbf{Description}                                    \\ \hline
-Hi                        &  Establish\\
-                          &  communication                                                                                                   \\ \hline
+Hi                        &  Establish communication \\
+%                          &  communication                                                                                                   \\ \hline
+\hline
 Install                  &  Install  eBPF\\
                          &  instruction on the device                                                                                       \\ \hline
 %Notificação               & roteador $\rightarrow$  controlador                 & \begin{tabular}[c]{@{}c@{}}Roteador envia os dados lidos dos \\ registradores do hardware \\ para controlador\end{tabular} \\ \hline
@@ -192,7 +194,7 @@ Packet In/Out                  &  Sends a packet to/from\\
                                & device from/to controller                                                                                       
 \\ \hline
 
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 The controller and device communicate via socket. After establishing the communication, both controller and network element can exchange messages with specific information. Table~\ref{tab:06_mes} displays the supported messages between controller and network element.
