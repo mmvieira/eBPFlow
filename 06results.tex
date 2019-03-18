@@ -35,6 +35,27 @@
 The eBPFlow was synthesized in the NetFPGA SUME and occupied 58\% of logical slice and 27\% of the register slice. The maximum frequency is 88.83 MHz (cycle of 11.25 ns).
 
 
+\subsection{Example programs}
+
+\begin{table}[h]
+\centering
+\caption{eBPF programs used during tests and their sizes}
+\label{tbl:example-sizes}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{eBPF program} & \textbf{\# instructions} \\ \hline
+return                & 4                        \\ \hline
+wire\_fast            & 5                        \\ \hline
+wire                  & 7                        \\ \hline
+learningswitch        & 27                       \\ \hline
+iprouter              & 30                       \\ \hline
+ddos\_mitigation      & 35                       \\ \hline
+l4lb                  & 155                      \\ \hline
+nat                   & 182                      \\ \hline
+chacha20              & 574                      \\ \hline
+\end{tabular}
+\end{table}
+
 \subsection{Experiments} 
 \label{sec:experiments}
 

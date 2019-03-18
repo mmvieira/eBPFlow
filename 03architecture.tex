@@ -176,7 +176,7 @@ For actions, the code can modify the packet and indicates to where the packet sh
 
 \begin{table}[htp]
 \centering
-\caption{Messages exchange between controller and network element.}
+\caption{Messages exchange between the controller and the network element.}
 \label{tab:06_mes}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{|c|c|}
@@ -191,13 +191,13 @@ Install                  &  Install  eBPF\\
 \begin{tabular}[c]{@{}c@{}}Table \\ command\end{tabular}  & \begin{tabular}[c]{@{}c@{}}Controller send command\\ (update, delete, lookup, list) to device\end{tabular}               
 \\ \hline
 Packet In/Out                  &  Sends a packet to/from\\
-                               & device from/to controller                                                                                       
+                               & device from/to the controller                                                                                       
 \\ \hline
 
 \end{tabular}}
 \end{table}
 
-The controller and device communicate via socket. After establishing the communication, both controller and network element can exchange messages with specific information. Table~\ref{tab:06_mes} displays the supported messages between controller and network element.
+The controller and device communicate via socket. After establishing the communication, both controller and network element can exchange messages with specific information. Table~\ref{tab:06_mes} displays the supported messages between the controller and the network element.
 
 The first message sent after the communication is established is the "Hi" message. 
 This message is sent to verify that the controller is connected to the network element and to obtain its datapath identification number. 

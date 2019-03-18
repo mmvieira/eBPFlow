@@ -90,7 +90,7 @@ After the metadata is received, comes the Ethernet frame. Metadata header fields
 \begin{tabular}[c]{@{}c@{}}Forwarding\end{tabular}  & 0 - 0xFFEF & Forwards packet. \\ \hline
 Controller     & \begin{tabular}[c]{@{}c@{}} 0xFFF3\end{tabular}                           & Send packet to the controller. \\ \hline
 \begin{tabular}[c]{@{}c@{}}Drop \end{tabular}  & 0xFFF0 & Drop packet. \\ \hline
-\begin{tabular}[c]{@{}c@{}}Flood \end{tabular} & \multicolumn{1}{c|}{0xFFFF}  & \begin{tabular}[c]{@{}c@{}}Send packet to all ports\\except for input port.\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}c@{}}Flood \end{tabular} & \multicolumn{1}{c|}{0xFFFF}  & \begin{tabular}[c]{@{}c@{}}Send packet to all ports\\except for the input port.\end{tabular} \\ \hline
 \end{tabular}}
 \end{table}
 
