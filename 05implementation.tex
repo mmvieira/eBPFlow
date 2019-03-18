@@ -30,7 +30,7 @@ on the packet properties, for example, an input port or destination address.
 The outgoing port of all incoming packets is configured in the metadata output port field.
 We implemented the device functionalities in the output port lookup module.
 
-\subsection{Finite State Machine Controller}
+\subsection{Finite State Machine of HW Controller}
 
 The finite state machine (FSM) in the module output port lookup controls the whole operation of packet processing. It removes the packet from the internal queue of the module (forwarded by the input arbiter module), starts executing the eBPF instructions and forwards the packet to the next module (action packet) when the last instruction (\texttt{exit}) of eBPF is executed. The finite state machine is made up of eight states.
 

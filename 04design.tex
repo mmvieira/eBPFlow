@@ -21,12 +21,33 @@ The packet processor extends the NetFPGA datapath with four new hardware modules
 \subsection{Metadata}
 \label{sec:metadata}
 
-\begin{figure}[ht]
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=1.\linewidth]{figures/06_fig03.png}
+% \caption{Metadata: Information retrieved from the input queue about the packet that is stored in the data memory of the eBPF processor.}
+% \label{fig:06_fig03}
+% \end{figure}
+
+\begin{table}[htp]
 \centering
-\includegraphics[width=1.\linewidth]{figures/06_fig03.png}
 \caption{Metadata: Information retrieved from the input queue about the packet that is stored in the data memory of the eBPF processor.}
-\label{fig:06_fig03}
-\end{figure}
+\label{tab:metadata}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|l}{0} &\multicolumn{3}{c}{bit} &\multicolumn{2}{r|}{255}\\
+\hline
+8 bits & 8 bits & 8 bits & 32 bits & 32 bits & 16 bits & 152 bits \\
+\hline
+Input & Source & Destination & Time-    &  Time-       & Length & Free \\
+Port  & Queue  & Queue       & stamp (s)& stamp (ns)   & (bytes) & \\
+\hline
+\multicolumn{7}{|c|}{Ethernet Frame} \\
+\hline
+\multicolumn{7}{|c|}{Payload} \\
+\hline
+\end{tabular}}
+\end{table}
 
 % \begin{table}[ht]
 % \centering
@@ -52,7 +73,8 @@ The packet processor extends the NetFPGA datapath with four new hardware modules
 
 The data plane receives the packet through the input interface and stores the packet in the input queue with some additional information called metadata.
 %Figure~\ref{fig:06_fig03} shows the stored structure.
-Figure~\ref{fig:06_fig03} shows the metadata header. First line indicates the byte order and the other lines show the stored structure.
+%Figure~\ref{fig:06_fig03}
+Table~\ref{tab:metadata} shows the metadata header. First line indicates the byte order and the other lines show the stored structure.
 After the metadata is received, comes the Ethernet frame. Metadata header fields can also be used by the eBPF program, as well as, any other protocol field. The currently defined metadata are the destination port, packet size in multiples of 64-bit, source port, packet size in bytes, timestamp in nano seconds and seconds. The fields of packet size in multiples of 64-bit and bytes are included because the input queue module already provided this information.
 
 \subsection{Actions}
@@ -61,6 +83,7 @@ After the metadata is received, comes the Ethernet frame. Metadata header fields
 \centering
 \caption{Action performed on the packets.}
 \label{tab:action}
+\resizebox{\linewidth}{!}{%
 \begin{tabular}{|c|c|c|}
 \hline
 \textbf{Action}   & \multicolumn{1}{c|}{\textbf{Code}} & \textbf{Description} \\ \hline
@@ -68,7 +91,7 @@ After the metadata is received, comes the Ethernet frame. Metadata header fields
 Controller     & \begin{tabular}[c]{@{}c@{}} 0xFFF3\end{tabular}                           & Send packet to the controller. \\ \hline
 \begin{tabular}[c]{@{}c@{}}Drop \end{tabular}  & 0xFFF0 & Drop packet. \\ \hline
 \begin{tabular}[c]{@{}c@{}}Flood \end{tabular} & \multicolumn{1}{c|}{0xFFFF}  & \begin{tabular}[c]{@{}c@{}}Send packet to all ports\\ except for input port.\end{tabular} \\ \hline
-\end{tabular}
+\end{tabular}}
 \end{table}
 
 
@@ -76,7 +99,8 @@ The return value of the eBPF processor, which is stored in register r0, is used 
 
 %The NetFPGA hardware consists of four Ethernet ports. Each port contains one MAC and one CPU queues (Figure~\ref{fig:06_fig01}) where the packet can be routed. The coding values of the respective actions are based on the one-hot encoding of the queues.
 
-eBPFlow enables other dynamic actions such as modifying the packet header, adding or removing fields.
-Unlike RMT~\cite{bosshart2013forwarding}, eBPFlow can also modify the packet payload.
+eBPFlow enables other dynamic actions such as modifying the packet header, packet payload, adding or removing fields.
+%Unlike RMT~\cite{bosshart2013forwarding}, 
+Some NFs like stream cypher requires to modify the packet payload. Other NF, like load balancer, only require to modify the packet header. The controller can configure the hardware to enable or disable modifying the packet payload. For NFs that do not require packet payload modification, this is an optimization.
 Since the packet is stored in the data memory, a store instruction modifies the packet. The packet content can also be used for arithmetic and logical operations, for example, decrementing TTL or recomputing checksum.
 

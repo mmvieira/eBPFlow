@@ -108,6 +108,8 @@ There are efforts of the open source Iovisor project~\cite{IOvisor} and from VMw
 
 %\subsection{Acyclic Control Flow Graph}
 \subsection{eBPF verifier}
+\label{sec:verifier}
+
 %verifier
 %There exits a verifier for programs with eBPF instructions.
 The Linux kernel implementation provides an implementation of an eBPF verifier.
@@ -118,29 +120,29 @@ This critical-path can provide an upper-bound on the execution time.
 The verifier enables to provide eBPF kernel-safe code execution.
 In eBPFlow, the verifier can be used after the code has been compiled and before loading it into the data plane.
 
-\begin{figure}[htb]
-\centering
-%\includegraphics[width=.8\linewidth]{figures/eBPF_Acyclic_Control_Flow_Graph-_SeqNum3.pdf}
-\includegraphics[width=.8\linewidth]{figures/eBPFACFG.pdf}
-\caption{eBPF Acyclic Control Flow Graph for the TCP sequence number example.}
-\label{fig:acfg}
-\end{figure}
+% \begin{figure}[htb]
+% \centering
+% %\includegraphics[width=.8\linewidth]{figures/eBPF_Acyclic_Control_Flow_Graph-_SeqNum3.pdf}
+% \includegraphics[width=.8\linewidth]{figures/eBPFACFG.pdf}
+% \caption{eBPF Acyclic Control Flow Graph for the TCP sequence number example.}
+% \label{fig:acfg}
+% \end{figure}
 
-If the eBPF program has no backwards jump or just bound-loops (so loop unrolling can be applied), then the eBPF program can be synthesized into a directed Acyclic Control Flow Graph (ACFG). 
-Figure~\ref{fig:acfg} shows the ACFG to extract the TCP sequence number.% example presented in Figure~\ref{fig:seqnum}. 
-Each ACFG node contains one or more eBPF instructions. Instruction ending with the letter i indicates that the instruction uses an immediate value.
+% If the eBPF program has no backwards jump or just bound-loops (so loop unrolling can be applied), then the eBPF program can be synthesized into a directed Acyclic Control Flow Graph (ACFG). 
+% Figure~\ref{fig:acfg} shows the ACFG to extract the TCP sequence number.% example presented in Figure~\ref{fig:seqnum}. 
+% Each ACFG node contains one or more eBPF instructions. Instruction ending with the letter i indicates that the instruction uses an immediate value.
 
-The conditional jump nodes are the nodes that contain two output lines and light gray background.
-Solid line indicates the next ACFG node. Dotted line indicates a jump to another ACFG node.
-In our example, the conditional jump nodes contain the jump not equal (jnei) instruction.
-The last number of the jnei instruction indicates how many instructions to jump when the condition is valid.
+% The conditional jump nodes are the nodes that contain two output lines and light gray background.
+% Solid line indicates the next ACFG node. Dotted line indicates a jump to another ACFG node.
+% In our example, the conditional jump nodes contain the jump not equal (jnei) instruction.
+% The last number of the jnei instruction indicates how many instructions to jump when the condition is valid.
 
-To better understand the eBPF program, let us explain that register r1 starts with a pointer to the packet and metadata (which we explain in Section~\ref{sec:metadata}) stored in the data memory and register r0 stores the return value.
+% To better understand the eBPF program, let us explain that register r1 starts with a pointer to the packet and metadata (which we explain in Section~\ref{sec:metadata}) stored in the data memory and register r0 stores the return value.
 
-In the first node, load byte instructions extract the bytes 26 and 27 from the data memory.
-Given that the metadata has 16 bytes, this represents bytes 10 and 11 of the packet (counting from 0), which is the Ethernet type field. Then, a byte swap is done to set the endiness. 
-First jump instruction compares if the Ethernet type is 0x0800. Next, the IP protocol field is extracted from the IPv4 packet and checks if it is the TCP protocol (value 6). Finally, the TCP sequence number is extracted and placed in the return register (r0). The last instruction tells that the code terminates.
-ACFG is useful to determine the worst-case execution time.
+% In the first node, load byte instructions extract the bytes 26 and 27 from the data memory.
+% Given that the metadata has 16 bytes, this represents bytes 10 and 11 of the packet (counting from 0), which is the Ethernet type field. Then, a byte swap is done to set the endiness. 
+% First jump instruction compares if the Ethernet type is 0x0800. Next, the IP protocol field is extracted from the IPv4 packet and checks if it is the TCP protocol (value 6). Finally, the TCP sequence number is extracted and placed in the return register (r0). The last instruction tells that the code terminates.
+% ACFG is useful to determine the worst-case execution time.
 
 
 
