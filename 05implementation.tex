@@ -17,18 +17,30 @@ It contains a Xilinx Vertex-7 690T FPGA~\cite{Virtex7},
 which has approximately 693,120 logic cells, a 27 MiB SRAM and 5 ns (200 MHz) clock cycle.
 %\marcos{XXXX logic cells, a 4 KiB SRAM with $2^{19}$ lines and 8 ns (125 MHz)} clock cycle.
 
-The packets in the NetFPGA are processed in the form of 64-bit words and 8-bit control to identify the word type (data or metadata). Words are transmitted by the data signal and the control by the ctrl signal. If the cntrl signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.
+\textcolor{red}{The packets in the NetFPGA are processed in the form of 256-bit words and 128 bits control to identify the word type (data or metadata). Words are transmitted by the data signal and control. If control signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.}
 
-The NetFPGA processes up to 64 bits of packet data per clock cycle (8 ns). Considering a packet size of 1,500 bytes and with that cycle, a packet takes approximately 2 $\mu{s}$ to be processed.
+%The packets in the NetFPGA are processed in the form of 64-bit words and 8-bit control to identify the word type (data or metadata). Words are transmitted by the data signal and the control by the ctrl signal. If the cntrl signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.
 
-The standard NetFPGA library provides the following modules: input arbiter, output port lookup and output queue. 
-The input arbiter receives the packets from the network (via the MAC interface) or the PCI bus (via CPU) in the format of 64-bit words and stores them in internal queues of the module.
-Then, the words are taken from the queues using the round-robin algorithm, and it routes them to
-the output port lookup module. 
-The output port lookup module is responsible for defining which port the packet will be sent based
-on the packet properties, for example, an input port or destination address. 
-The outgoing port of all incoming packets is configured in the metadata output port field.
-We implemented the device functionalities in the output port lookup module.
+%The NetFPGA processes up to 64 bits of packet data per clock cycle (8 ns). Considering a packet size of 1,500 bytes and with that cycle, a packet takes approximately 2 $\mu{s}$ to be processed.
+
+%The standard NetFPGA library provides the following modules: input arbiter, output port lookup and output queue. The input arbiter receives the packets from the network (via the MAC interface) or the PCI bus (via CPU) in the format of 64-bit words and stores them in internal queues of the module. Then, the words are taken from the queues using the round-robin algorithm, and it routes them to the output port lookup module.  The output port lookup module is responsible for defining which port the packet will be sent based on the packet properties, for example, an input port or destination address. The outgoing port of all incoming packets is configured in the metadata output port field. We implemented the device functionalities in the output port lookup module.
+
+The standard NetFPGA library provides the following modules: input arbiter, output port lookup and output queue. The input arbiter receives the packets from the network (via the MAC interface) or the PCI bus (via CPU) in the format of 256-bit words and stores them in internal queues of the module. Then, the words are taken from the queues using the round-robin algorithm, and it routes them to the output port lookup module.  The output port lookup module is responsible for defining which port the packet will be sent based on the packet properties, for example, an input port or destination address. The outgoing port of all incoming packets is configured in the metadata output port field. We implemented the device functionalities in the output port lookup module.
+
+\textcolor{red}{Table \ref{tab:eBPFresource} lists the logic and memory resource used by eBPFlow implementation on NetFPGA SUME.  We compared the resource used by eBPFlow with a reference switch.}      
+
+\begin{table}[hbt]
+\centering
+\caption{NeFPGA's resource requirements for eBPFlow compared to reference switch.}
+\label{tab:eBPFresource}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Resource Type} & \textbf{Reference switch} & \textbf{eBPFlow} \\ \hline
+\# Slice LUTs          & 49436 (11\%)              & 54085 (12.48\%)  \\ \hline
+\# Block RAMs          & 194 (13\%)                & 200.50 (13.63\%) \\ \hline
+\end{tabular}
+\end{table}
+
 
 \subsection{Finite State Machine of HW Controller}
 
