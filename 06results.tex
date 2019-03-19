@@ -32,69 +32,71 @@
 
 %Na figura~\ref{fig:06_fig11}
 
-The eBPFlow was synthesized in the NetFPGA SUME and occupied 58\% of logical slice and 27\% of the register slice. The maximum frequency is 88.83 MHz (cycle of 11.25 ns).
+\textcolor{red}{The eBPFlow was synthesized in the NetFPGA SUME and occupied 58\% of logical slice and 27\% of the register slice. The maximum frequency is 88.83 MHz (cycle of 11.25 ns).}
 
 
 \subsection{Use cases}
+\textcolor{black}{We implemented NFs (Table~\ref{tbl:example-sizes}) to demonstrate eBPFlow's expressive abstraction for network function packet processing. For each NF, we present the number of eBPF instructions and the number of lines of C code. The applications are ordered in Table~\ref{tbl:example-sizes} according to the number of instructions.}
 
 \begin{table}[h]
 \centering
-\caption{eBPF programs used during tests and their sizes}
+\caption{eBPF programs used during experiments.}
 \label{tbl:example-sizes}
-\begin{tabular}{|l|c|}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{|c|c|c|}
 \hline
-\textbf{eBPF program} & \textbf{\# instructions} \\ \hline
-return                & 4                        \\ \hline
-wire\_fast            & 5                        \\ \hline
-wire                  & 7                        \\ \hline
-learningswitch        & 27                       \\ \hline
-iprouter              & 30                       \\ \hline
-ddos\_mitigation      & 35                       \\ \hline
-l4lb                  & 155                      \\ \hline
-nat                   & 182                      \\ \hline
-chacha20              & 574                      \\ \hline
-\end{tabular}
+\textbf{eBPF programs} & \textbf{\#Instructions} & \textbf{\#C lines}\\  \hline
+Return                & 4                         & 8\\ \hline
+Wire Fast             & 5                         & 8\\ \hline
+%wire                  & 7                       &\\ \hline
+Learning Switch       & 27                       & 35\\ \hline
+IPv4 Router           & 30                       & 35\\ \hline
+DDoS Mitigation       & 35                       & 82\\ \hline
+%l4lb                  & 155                     & \\ \hline
+NAT                   & 182                      & 229\\ \hline
+Chacha 8  (Loop Unroll off) &     575            & 356\\ \hline
+Chacha 20 (Loop Unroll off) &     575          & 356\\ \hline
+Chacha 8  (Loop Unroll on)  &     1,543        & 356\\ \hline
+Chacha 20 (Loop Unroll on)  &     3,965        & 356\\ \hline
+\end{tabular}}
 \end{table}
 
 \subsection{Experiments} 
 \label{sec:experiments}
 
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=1.\linewidth]{figures/07_fig03-3hosts.png}
-% \caption{Topology of the experiments.}
-% \label{fig:07_fig03}
-% \end{figure}
-
-\begin{figure}[htb]
+\begin{figure}[ht]
 \centering
-\includegraphics[width=1.\linewidth]{figures/goodputxbytes.png}
-%\includegraphics[width=1.\linewidth]{figures/throughputxbytes.png}
-\caption{Goodput per packet size.}
-\label{fig:07result}
+\includegraphics[width=1.\linewidth]{figures/07_fig03-3hosts.png}
+\caption{Topology of the experiments.}
+\label{fig:07_fig03}
 \end{figure}
 
-% Figure~\ref{fig:07_fig03} presents the topology of the experiments. The NetFPGA has 4 ports. The switch interconnects three host computers and also connects to the controller.
-
-% We developed C language applications. The code is compiled with LLVM 3.9 for the eBPF big endian platform.
-% The LLVM compiler generates an executable in the executable and link format (ELF).
-% The objcopy tool extracts the instruction set from the .text segment of the elf file.
-% The controller installs this segment into eBPFlow.
-
-The first application forwards frames from one interface to another. There is no learning involved, the output ports are hard-coded. Using the iperf tool, UDP connections are created between terminals A and B. Figure~\ref{fig:07result} shows the UDP goodput per packet size. This experiment evaluates what is the maximum obtained goodput.
-
-The second example is an IPv4 router.
-When eBPFlow receives a frame, it checks if the frame is an Ethernet frame and if it contains an IPv4 packet. It extracts the IPv4 destination and searches the TCAM for the output port.
-The available actions are to forward the packet or drop it.
-Figure~\ref{fig:IPv4routerresult} shows the goodput for UDP flow with packets of 1472 bytes.
-
-\begin{figure}[htb]
-\centering
-\includegraphics[width=1.\linewidth]{figures/ipv4goodput.png}
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[width=1.\linewidth]{figures/goodputxbytes.png}
 %\includegraphics[width=1.\linewidth]{figures/throughputxbytes.png}
-\caption{UDP Goodput for IPv4 router.}
-\label{fig:IPv4routerresult}
-\end{figure}
+%\caption{Goodput per packet size.}
+%\label{fig:07result}
+%\end{figure}
+
+Figure~\ref{fig:07_fig03} presents the topology of the experiments. The NetFPGA has 4 ports. The switch interconnects three host computers and also connects to the controller.
+
+We developed C language applications. The code is compiled with LLVM 3.9 for the eBPF big endian platform. The LLVM compiler generates an executable in the executable and link format (ELF). The objcopy tool extracts the instruction set from the .text segment of the elf file.
+The controller installs this segment into eBPFlow.
+
+\textcolor{red}{The first application forwards frames from one interface to another. There is no learning involved, the output ports are hard-coded. Using the iperf tool, UDP connections are created between terminals A and B. Figure %~\ref{fig:07result} 
+shows the UDP goodput per packet size. This experiment evaluates what is the maximum obtained goodput.}
+
+The second example is an IPv4 router. When eBPFlow receives a frame, it checks if the frame is an Ethernet frame and if it contains an IPv4 packet. It extracts the IPv4 destination and searches the TCAM for the output port. The available actions are to forward the packet or drop it. Figure %~\ref{fig:IPv4routerresult} 
+shows the goodput for UDP flow with packets of 1472 bytes.
+
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[width=1.\linewidth]{figures/ipv4goodput.png}
+%\includegraphics[width=1.\linewidth]{figures/throughputxbytes.png}
+%\caption{UDP Goodput for IPv4 router.}
+%\label{fig:IPv4routerresult}
+%\end{figure}
 
 % \begin{table}[htb]
 % \centering
@@ -111,21 +113,12 @@ Figure~\ref{fig:IPv4routerresult} shows the goodput for UDP flow with packets of
 % \label{tab:IPv4routerresult}
 % \end{table}
 
+The third application is an L2 learning switch. The advantage of a protocol-independent switch is that it only needs to parse the frame header fields for the protocols defined by the programmer. In this example, the parser only needs to parse Ethernet headers while protocol-dependent switch would process other frame or packet header fields. CAM (exact-match) lookup table stores the Ethernet MAC address and the input port. 
+For each input frame, if the source address is unicast, the code can self-populate the lookup table by updating it. This second advantage can reduce network traffic, latency, and CPU controller overhead. Using the destination MAC, the output port is searched. If there is an entry, then the packet is forwarded otherwise there are two options. It can be flooded or sent to the controller. In this experiment, we opted to flood.
 
-The third application is an L2 learning switch.
-The advantage of a protocol-independent switch is that it only needs to parse the frame header fields for the protocols defined by the programmer. In this example, the parser only needs to parse Ethernet headers while protocol-dependent switch would process other frame or packet header fields. CAM (exact-match) lookup table stores the Ethernet MAC address and the input port. 
-For each input frame, if the source address is unicast, the code can self-populate the lookup table by updating it.
-This second advantage can reduce network traffic, latency, and CPU controller overhead.
-Using the destination MAC, the output port is searched.
-If there is an entry, then the packet is forwarded otherwise there are two options. It can be flooded or sent to the controller. In this experiment, we opted to flood.
-
-
-The code is installed through the NetFPGA register interface.
-The time to read or write one register in this interface is 500 us.
-Each eBPF instruction (64 bits) utilizes two registers (32 bits).
-To start the code installation, it requires 2 write operations.
-Thus, the time to install a code is given by:\\
-Time to install code $=$ (number of instructions+2) $* 500 us * 2.$ 
+%Não tenho esssa informação. 
+%The code is installed through the NetFPGA register interface. The time to read or write one register in this interface is 500 us. Each eBPF instruction (64 bits) utilizes two registers (32 bits). To start the code installation, it requires 2 write operations.
+%Thus, the time to install a code is given by:\\Time to install code $=$ (number of instructions+2) $* 500 us * 2.$ 
 
 In the last experiment, eBPFlow starts as IPv4 router. During runtime, we install the learning switch. This experiment validates the system by showing that the switch executes these instructions for each received packet, allowing a data plane with dynamic parse, matching, and actions at run time with zero downtime.
 
@@ -138,6 +131,46 @@ The number after ChaCha indicates how many rounds to apply the cipher over the d
 We tried to implement it on the Netronome Agilio CX 1x40 Gbps SmartNIC but it can only support up to eight rounds. Netronome expressiveness can be categorized as eBPF-verifier. It requires the verifier and loop unrolling, which increases the number of instructions and thus does not fit in the smartNIC memory instruction.
 But, \system is able to execute ChaCha20.
 
+\subsection{Zero downtime}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.\linewidth]{figures/zerodowntime.png}
+\caption{Zero downtime using DDoS Mitigation.}
+\label{fig:zerodowntime}
+\end{figure}
+
+\subsection{Throughput}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.\linewidth]{figures/throughput_mpps_64B.pdf}
+\caption{Throughput with packet 64 Bytes.}
+\label{fig:throughput64}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.\linewidth]{figures/throughput_gbps_1500B.pdf}
+\caption{Throughput with packets 1500 bytes.}
+\label{fig:throughput1500}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.\linewidth]{figures/payload-1500B.pdf}
+\caption{Max throughput with  payload signal enabled and disabled to packets 1500 bytes.}
+\label{fig:payload-1500B}
+\end{figure}
+
+\subsection{Latency}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.\linewidth]{figures/latency.pdf}
+\caption{Average latency ranging packet size.}
+\label{fig:latency}
+\end{figure}
 
 
 

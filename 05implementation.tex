@@ -12,12 +12,12 @@ The user space tools are composed of a controller responsible for defining how t
 FPGA (Field Programmable Gate Array) enables to build hardware logic system.
 %In this work, eBPFlow was implemented in NetFPGA SUME platform. 
 The NetFPGA SUME hardware has four SFP+ transceivers that support 10 Gbps Ethernet ports.
-It connects to a motherboard though an PCIe Gen 3 x8 adapter.
+It connects to a motherboard through an PCIe Gen 3 x8 adapter.
 It contains a Xilinx Vertex-7 690T FPGA~\cite{Virtex7},
 which has approximately 693,120 logic cells, a 27 MiB SRAM and 5 ns (200 MHz) clock cycle.
 %\marcos{XXXX logic cells, a 4 KiB SRAM with $2^{19}$ lines and 8 ns (125 MHz)} clock cycle.
 
-\textcolor{red}{The packets in the NetFPGA are processed in the form of 256-bit words and 128 bits control to identify the word type (data or metadata). Words are transmitted by the data signal and control. If control signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.}
+\textcolor{black}{The packets in the NetFPGA are processed in the form of 256-bit words and 128 bits control to identify the word type (data or metadata). Words are transmitted by the data signal and control. If control signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.}
 
 %The packets in the NetFPGA are processed in the form of 64-bit words and 8-bit control to identify the word type (data or metadata). Words are transmitted by the data signal and the control by the ctrl signal. If the cntrl signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.
 
@@ -27,7 +27,7 @@ which has approximately 693,120 logic cells, a 27 MiB SRAM and 5 ns (200 MHz) cl
 
 The standard NetFPGA library provides the following modules: input arbiter, output port lookup and output queue. The input arbiter receives the packets from the network (via the MAC interface) or the PCI bus (via CPU) in the format of 256-bit words and stores them in internal queues of the module. Then, the words are taken from the queues using the round-robin algorithm, and it routes them to the output port lookup module.  The output port lookup module is responsible for defining which port the packet will be sent based on the packet properties, for example, an input port or destination address. The outgoing port of all incoming packets is configured in the metadata output port field. We implemented the device functionalities in the output port lookup module.
 
-\textcolor{red}{Table \ref{tab:eBPFresource} lists the logic and memory resource used by eBPFlow implementation on NetFPGA SUME.  We compared the resource used by eBPFlow with a reference switch.}      
+\textcolor{black}{Table \ref{tab:eBPFresource} lists the logic and memory resource used by eBPFlow implementation on NetFPGA SUME.  We compared the resource used by eBPFlow with a reference switch.}      
 
 \begin{table}[hbt]
 \centering
