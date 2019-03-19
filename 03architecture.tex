@@ -50,15 +50,14 @@ To parse a packet, it is loaded into the eBPF data memory. The execution of the 
 \end{comment}
 
 %expressiveness
-eBPF provides more expressiveness than OpenFlow.
-OpenFlow matching structure has some limitations.
-It is unable to do inequality, complement (not operation), or range matching~\cite{Jouet2015OpenFlow}. 
-For instance, it can not do logical operations such as $\geq$ or $<$, which are needed for range expressions. 
-If it needs a negation rule, for example, a match on a flow that is not on destination port 80 (web traffic), it needs to create rules for the other complement values. 
-On the other hand, eBPF can express all these cases.
-Moreover, OpenFlow switch can not extract Time-To-Live (TTL) or TCP Sequence Number fields, which are important to detect expiring packets and TCP migration, respectively. 
-The OpenFlow solution to extract fields that are not part of the OpenFlow standard is to do it at the OpenFlow controller. 
-On the other hand, an eBPF program containing only 6 instructions for each field can extract them.
+eBPF supports more expressiveness flow rules.
+%OpenFlow matching structure has some limitations.
+It enables flow rules to be written with inequality, complement (not operation), or range matching. 
+For instance, it can do logical operations such as $\geq$ or $<$, which are needed for range expressions. 
+By allowing the negation rule, for example, a match on a flow that is not on destination port 80 (web traffic), it does not need to create rules for the other complement values, reducing the number of flow rules. 
+% Moreover, OpenFlow switch can not extract Time-To-Live (TTL) or TCP Sequence Number fields, which are important to detect expiring packets and TCP migration, respectively. 
+% The OpenFlow solution to extract fields that are not part of the OpenFlow standard is to do it at the OpenFlow controller. 
+% On the other hand, an eBPF program containing only 6 instructions for each field can extract them.
 
 %Top-of-Rack switches allows for approximately ~2000 OpenFlow flow entries.
 
@@ -84,6 +83,7 @@ High-level languages can be used to write code to the data plane and compile it 
 
 It is also possible to generate eBPF instructions through specific domain languages, such as P4~\cite{Bosshart:2014:P4}.
 There are efforts of the open source Iovisor project~\cite{IOvisor} and from VMware~\cite{p4c-xdp2018} that have already implemented a compiler from P4 to eBPF~\cite{P42EBPF2015}.
+Thus, by choosing the eBPF instruction set, \system can also leverage previous C and P4 projects and applications.
 
 % \begin{figure}[htb]
 % \centering
@@ -118,7 +118,7 @@ If desired, the verifier allows eBPF programs with only bound-loops to enable st
 The eBPF verifier checks whether a program terminates, whether the memory accesses are in the range of memory space, and the greatest depth of the execution path (critical-path).
 This critical-path can provide an upper-bound on the execution time.
 The verifier enables to provide eBPF kernel-safe code execution.
-In eBPFlow, the verifier can be used after the code has been compiled and before loading it into the data plane.
+In eBPFlow, the verifier can be used after the code has been compiled and before loading it into the data plane for static analysis.
 
 % \begin{figure}[htb]
 % \centering

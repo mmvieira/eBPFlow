@@ -14,10 +14,10 @@ FPGA (Field Programmable Gate Array) enables to build hardware logic system.
 The NetFPGA SUME hardware has four SFP+ transceivers that support 10 Gbps Ethernet ports.
 It connects to a motherboard though an PCIe Gen 3 x8 adapter.
 It contains a Xilinx Vertex-7 690T FPGA~\cite{Virtex7},
-which has approximately 693,120 logic cells, a 27 MiB SRAM and 5 ns (200 MHz) clock cycle.  
-\marcos{XXXX logic cells, a 4 KiB SRAM with $2^{19}$ lines and 8 ns (125 MHz)} clock cycle.
+which has approximately 693,120 logic cells, a 27 MiB SRAM and 5 ns (200 MHz) clock cycle.
+%\marcos{XXXX logic cells, a 4 KiB SRAM with $2^{19}$ lines and 8 ns (125 MHz)} clock cycle.
 
-The packets in the NetFPGA are processed in the form of 64-bit words and 8-bit control to identify the word type (data or metadata). Words are transmitted by the data signal and the control by the ctrl signal. If the control signal is equal to zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.
+The packets in the NetFPGA are processed in the form of 64-bit words and 8-bit control to identify the word type (data or metadata). Words are transmitted by the data signal and the control by the ctrl signal. If the cntrl signal is zero, it means that the words of the packet are being transmitted, otherwise the words are from the metadata.
 
 The NetFPGA processes up to 64 bits of packet data per clock cycle (8 ns). Considering a packet size of 1,500 bytes and with that cycle, a packet takes approximately 2 $\mu{s}$ to be processed.
 
@@ -127,7 +127,7 @@ The eBPF instructions define the behavior of how the eBPF processor handles the 
 \label{fig:mem_db}
 \end{figure}
 
-\textcolor{black}{As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors in the future using a shared instruction memory. By increasing the number of eBPF processors, more packets can be processed, contributing to the increase in the throughput.}
+\textcolor{black}{As a design decision, we have put the instruction memory outside of the eBPF processor in order to enable the connection of multiple processors using a shared instruction memory. By increasing the number of eBPF processors, more packets can be processed, contributing to the increase in the throughput.}
 
 
 \begin{comment}
@@ -185,12 +185,12 @@ Thus, to manipulate tables, the function call inside the processor is replaced b
 Thus, where there is call instruction, the processor communicates with the coprocessor module.
 This module identifies what function (lookup, update, delete) was called though the call instruction immediate opcode parameter. 
 Parameters are passed through register 1 to 4.
-Register r1 indicates which hardware module to communicate (tables TCAM, CAM, DRAM, respectively).
-Register r2 provides the key.
-Register r3 stores the item.
-Register r4 has the TCAM mask item.
-Function return parameter is through register r0.
-Since the call instruction requires register values, it can also suffers from hazard in the pipeline. The hazard unit has to stall solve this issue.
+Register R1 indicates which hardware module to communicate (tables TCAM, CAM, DRAM, respectively).
+Register R2 provides the key.
+Register R3 stores the item.
+Register R4 has the TCAM mask item.
+Function return parameter is through register R0.
+Since the call instruction requires register values, it can also suffers from hazard in the pipeline. The hazard unit has to stall to solve this issue.
 Thus, for optimization, current call instruction is done through synchronous communication with coprocessor hardware modules since their functions are implemented in hardware.
 
 
