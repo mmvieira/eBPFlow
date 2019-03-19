@@ -8,6 +8,12 @@ To address this, it is important for the network to be efficient and programmabl
 
 % Software-Defined Networking (SDN) is a paradigm for the development of research in computer networks that has gained the attention of the scientific community and industry in the area. SDN is a paradigm that separates the control plane from the data plane and allows the administrator to program the devices~\cite{ProgrammableNetworks2015}. In SDN, the control plane configures the routing rules of the network with a logically centralized entity called controller, while the data plane forwards the packets according to the actions defined by this controller. Due to the structure that SDN provides, research areas such as traffic engineering, quality of service (QoS), and virtualization have evolved rapidly~\cite{stubbe2017p4}.
 
+\begin{figure}[th]
+\centering
+\includegraphics[width=.6\linewidth]{figures/"eBPFlowHierarchicalLanguages".pdf}
+\caption{Expressiveness of current abstractions.}
+\label{fig:Language}
+\end{figure}
 
  
 % The OpenFlow~\cite{McKeown:2008:OpenFlow} standard is an example of SDN, which has seen significant growth since its first release in 2008 until the release of the current version (1.5)~\cite{ChristianSurveySDN2015}. The first version of OpenFlow had a matching table of ten fields and evolved into multiple tables with 44 different fields~\cite{ChristianSurveySDN2015}. However, the number of fields supported by OpenFlow is constantly being updated to support new fields and protocols, such as the IPv6 protocol. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and protocols~\cite{Jouet:2017:BPFabric}.
@@ -31,13 +37,6 @@ The device was prototyped on the NetFPGA SUME 40 Gb/s~\cite{SUME2014} platform. 
 
 
 
-\begin{figure}[!htp]
-\centering
-\includegraphics[width=.6\linewidth]{figures/"eBPFlowHierarchicalLanguages".pdf}
-\caption{Expressiveness}
-\label{fig:Language}
-\end{figure}
-
 Figure~\ref{fig:Language} presents the expressiveness of current designs. The first version of OpenFlow~\cite{McKeown:2008:OpenFlow} standard had a matching table of ten fields and evolved into multiple tables with 44 different fields in the release of version (1.5)~\cite{ChristianSurveySDN2015}. Unfortunately, OpenFlow has a protocol-dependent data plane with parsing, matching, and fixed actions, making it difficult to support new fields and 
 protocols~\cite{Jouet:2017:BPFabric}.
 P4~\cite{Bosshart:2014:P4} provides a programmable parser, enabling to match new fields. P4 follows the match-action abstraction model where network functions are described as a pipeline of a programmable parser and stages of match and action components. P4-16~\cite{P4-16} provides a primitive to store state using small registers but this is too restrict for large range of stateful functions. OpenState~\cite{Bianchi:2014:OPP:2602204.2602211} and FAST (Flow-level State Transitions)~\cite{Moshref:2014:FST:2620728.2620729} allow to program by explicitly defining flow state using Finite State Machine (FSM). But FSMs need to define all possible states, which does not scale. Extended Finite State Machines (EFSM) enhances the FSM model by allowing variables to describe state and trigger transactions. FlowBaze~\cite{FlowBlaze2019} allows stateful packet processing in hardware by programming using EFSM. eBPF-verifier is the set of eBPF programs that passes the eBPF-verifier. The verifier (see \textsection~\ref{sec:verifier}) does not allow backward jumps, thus, loops have to be unrolled. Finally, there are eBPF and x86 instructions that provide Turing-Complete\footnote{assuming memory is not a constraint} execution model.
@@ -49,7 +48,7 @@ P4~\cite{Bosshart:2014:P4} provides a programmable parser, enabling to match new
 
 %Moreover, hardware devices give the impression of being inflexible since their components are hard-coded and hard-placed. We address the following question: Is it possible to design a programmable protocol-independent packet processor in hardware that enables to modify the parsing, matching, and actions at runtime? 
 
- \begin{figure}[!htp]
+ \begin{figure}[t]
  \centering
 \includegraphics[width=.8\linewidth]{figures/"eBPFlow Design Space".pdf}
  \caption{Design Space}

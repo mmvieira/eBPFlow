@@ -29,7 +29,7 @@ The standard NetFPGA library provides the following modules: input arbiter, outp
 
 \textcolor{black}{Table \ref{tab:eBPFresource} lists the logic and memory resource used by eBPFlow implementation on NetFPGA SUME.  We compared the resource used by eBPFlow with a reference switch.}      
 
-\begin{table}[hbt]
+\begin{table}[tb]
 \centering
 \caption{NeFPGA's resource requirements for eBPFlow compared to reference switch.}
 \label{tab:eBPFresource}
@@ -48,7 +48,7 @@ The finite state machine (FSM) in the module output port lookup controls the who
 
 \subsection{eBPF Processor}
 
-\begin{figure*}[hbt]
+\begin{figure*}[t]
 \centering
 \includegraphics[width=.9\textwidth]{figures/06_fig02.png}
 \caption{Control and Datapath of the eBPF processor.}
@@ -65,7 +65,7 @@ After the instruction is fetched from the memory instruction, it is divided into
 
 The eBPF opcode is divided into seven classes: immediate load, load, immediate store, store, arithmetic and logical operations, jumps, 64-bit arithmetic and logical operations, and the other class is reserved for future use. The eBPF processor has 64-bit instruction, 32 bits for representing an immediate number (\texttt{imm}), 16 bits for offset, 4 bits for source register, 4 bits for destination register and, finally the 8-bit operation code (\texttt{opcode}). The opcode can be redivided depending on the instruction class. For load and store, the opcode has 3 most significant bits for memory access mode, 2 bits for word size and 3 bits for instruction class. For the jump instructions, logic and arithmetic, the 4 most significant bits specify what the operation is, 1 bit to specify whether the instruction is performed with the immediate value or with the source operand and, finally 3 bits less significant for the instruction class.
 
-\begin{table}[ht]
+\begin{table}[tb]
 \centering
 \caption{Description of the eBPF register set.}
 \label{tab:eBPFreg}
@@ -132,7 +132,7 @@ The eBPF instructions define the behavior of how the eBPF processor handles the 
 
 \textcolor{black}{Instruction memory uses a double buffer system - DBS (Figure~\ref{fig:mem_db}) to provide zero downtime in the change of eBPF programs. This system is composed of two memories (M$_{1}$ and M$_{2}$). Both memories never assume the same state (writing or reading) at the same time. It means that while eBPF program is written to a memory, the eBPF processor reads the instructions of the other memory. DBS is initialized with eBPF instructions written on M$_{1}$, while M$_{2}$ remains idle. The system remains in the wait state until a new set of instructions will be received. After the instructions are written to M$_{1}$, the system will return to the standby state. When a new set of instructions is received, the memories change their states, which means that M$_{1}$ will no longer be written and will be read while M$_{2}$ will be written. If a new instruction set is received, these instructions are written in M$_{2}$, while the instructions previously written in M$_{1}$ are read and processed by the eBPF processor. This process can be repeated indefinitely.} 
 
-\begin{figure}[ht]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=\linewidth]{figures/memory_db.png}
 \caption{Instruction memory - Double Buffer System.}
@@ -168,7 +168,7 @@ It is generated using Xilinx's IP core generator \textit{coregen}~\cite{xilinx_c
 There are three functions to manipulate the maps: update, delete, and lookup. The update operation updates an item into the map. If the item does not exist, it inserts the item. The delete operation removes the item with the given key. The lookup operation searches for the key and returns an item.
 To manipulate these tables, the user can write C program and invoke the three functions through function calls.
 
-\begin{figure}[ht]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=1.\linewidth]{figures/coprocessor.png}
 \caption{Coprocessor and Maps table.}
@@ -210,7 +210,7 @@ Thus, for optimization, current call instruction is done through synchronous com
 
 \subsection{Synchronization}
 
-\begin{figure}[ht]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=\linewidth]{figures/06_fig04.png}
 %\caption{Synchronization of the switch modules.}

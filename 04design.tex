@@ -1,7 +1,7 @@
 \section{\system Design}
 \label{sec:design}
 
-\begin{figure}[!htbp]
+\begin{figure}[t]
 \centering
 \includegraphics[width=1.\linewidth]{figures/06_fig01.png}
 \caption{Packet processor datapath design and implementation on NetFPGA SUME.}
@@ -30,7 +30,7 @@ The eBPF instructions generated from the user-created C and P4 codes are stored 
 % \label{fig:06_fig03}
 % \end{figure}
 
-\begin{table}[htp]
+\begin{table}[tb]
 \centering
 \caption{Metadata: Information retrieved from the input queue about the packet that is stored in the data memory of the eBPF processor.}
 \label{tab:metadata}
@@ -81,7 +81,7 @@ After the metadata is received, comes the Ethernet frame. Metadata header fields
 
 \subsection{Actions}
 
-\begin{table}[ht]
+\begin{table}[tb]
 \centering
 \caption{Action performed on the packets.}
 \label{tab:action}
