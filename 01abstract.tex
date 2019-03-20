@@ -4,7 +4,7 @@ Providing an expressive (Turing-Complete) abstraction for network function packe
 In this work, we propose eBPFlow, a model for Turing-Complete, hardware-based packet processing. It enables the programming of stateful and stateless network functions and the use of dynamically defined new fields and protocols, without the need to recompile or restart the hardware platform when the user changes, at run time, how the flows should be processed.
 eBPFlows run an eBPF (enhanced Berkeley Packet Filter) processor that enables the processing of protocol-independent network flows using eBPF instructions generated from programs written by the user in a high-level language.
 Our prototype was implemented on the NetFPGA SUME 40 Gb/s platform.
-We show the feasibility of building network functions, such as a learning switch, a load balancer, and a cryptographic primitive.
+We show the feasibility of building network functions, such as a learning switch, an IPv4 router and a cryptographic primitive.
 Our results show that the system allows modifying parsing, matching, and actions at run time with zero downtime.
 We plan to make the eBPFlow implementation publicly available.
 \end{abstract}

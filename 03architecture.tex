@@ -152,15 +152,15 @@ The network manager writes a program in C or P4 language, and then compiles to e
 
 %O roteador executa essas instruções para cada pacote recebido, permitindo um plano de dados com análise, casamento e ações dinâmicas.
 
-\subsection{Decoupling state from code}
-%\subsection{Self-Populate}
-\label{sec:selfpopulate}
+% \subsection{Decoupling state from code}
+% %\subsection{Self-Populate}
+% \label{sec:selfpopulate}
 
-eBPF enables to decouple code and state.
-States are stored using maps.
-The code is used to parse the packet.
-For a matching, the code executes logical expressions and calls maps to query, for example, the next hop given the destination IP.
-For actions, the code can modify the packet and indicates to where the packet should be forwarded.
+% eBPF enables to decouple code and state.
+% States are stored using maps.
+% The code is used to parse the packet.
+% For a matching, the code executes logical expressions and calls maps to query, for example, the next hop given the destination IP.
+% For actions, the code can modify the packet and indicates to where the packet should be forwarded.
 
 % Given this decoupling, the eBPFlow can self-populate the tables. The eBPF instruction can call the maps functions to insert, delete, or update the tables. This is not possible with current P4 or OpenFlow standard where
 % the controller is responsible for making

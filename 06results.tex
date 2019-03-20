@@ -32,25 +32,33 @@
 
 %Na figura~\ref{fig:06_fig11}
 
-\textcolor{red}{The eBPFlow was synthesized in the NetFPGA SUME and occupied 58\% of logical slice and 27\% of the register slice. The maximum frequency is 88.83 MHz (cycle of 11.25 ns).}
+Here, we present the experimental evaluation of eBPFlow. 
+% To understand its capabilities and limits we performed several experiments on a controlled environment (\textsection\ref{sec:experiments}) with several use cases (\textsection\ref{sec:use-cases}). We validated eBPFlow's ability to perform zero downtime program switch (\textsection\ref{sec:downtime}), measured throughput, and latency for each NF (\textsection\ref{sec:performance}) and also its power consumption (\textsection\ref{sec:power}).  
 
 \subsection{Test environment} 
 \label{sec:experiments}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.7\columnwidth]{figures/test-topology-ebpflow.pdf}
-\caption{Topology of the experiments.}
-\label{fig:07_fig03}
-\end{figure}
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.7\columnwidth]{figures/test-topology-ebpflow.pdf}
+% \caption{Topology of the experiments.}
+% \label{fig:07_fig03}
+% \end{figure}
 
-Figure~\ref{fig:07_fig03} presents the topology used to run the experiments, which consisted on one NetFPGA SUME, one server running \textit{pktgen-DPDK}\footnote{https://pktgen-dpdk.readthedocs.io} acting as a traffic generator, and a custom controller used to interact with the eBPFlow processor. The server was equipped with a Netronome Agilio CX SmartNIC with two 10 Gbps interfaces directly connected to the NetFPGA, sending network traffic at line rate.
+% Figure~\ref{fig:07_fig03} presents the topology used to run the experiments, 
+
+The test topology used during tests consisted on one NetFPGA SUME, one server running \textit{pktgen-DPDK}~\cite{Pktgen2016} acting as a traffic generator, and a custom controller used to interact with the eBPFlow processor. The server was equipped with a Netronome Agilio CX SmartNIC with two 10 Gbps interfaces. Each 10 GbE port is connected directly to each of two active NetFPGA ports, sending network traffic at line rate, following the same configuration as~\cite{FlowBlaze2019}. Both the traffic generation server and the server holding the NetFPGA were powered by i7-7700 \@ 3.60GHz processors with 8 cores and 8GB of RAM.
+
 
 % We developed C language applications. The code is compiled with LLVM 3.9 for the eBPF big endian platform. The LLVM compiler generates an executable in the executable and link format (ELF). The objcopy tool extracts the instruction set from the .text segment of the elf file.
 % The controller installs this segment into eBPFlow.
 
 \subsection{Use cases}
-\textcolor{black}{We implemented several NFs (Table~\ref{tbl:example-sizes}) to demonstrate eBPFlow's expressive abstraction for network function packet processing. For each NF, we present the number of eBPF instructions and the number of lines of C code. The applications are ordered in Table~\ref{tbl:example-sizes} according to the number of instructions}, where $LU$ indicates programs compiled with Loop Unrolling (LU) enabled.
+\label{sec:use-cases}
+
+We implemented several NFs (Table~\ref{tbl:example-sizes}) to demonstrate eBPFlow's expressive abstraction for network function packet processing. For each NF, we present the number of eBPF instructions and the number of C code lines. 
+%The applications are ordered in Table~\ref{tbl:example-sizes} according to the number of instructions}, where. 
+$LU$ indicates programs compiled with Loop Unrolling (LU) enabled. From Figure~\ref{fig:Language}, the $LU$ enabled programs are classified as eBPF-verifier. These programs require more instructions since the loop has to be unrolled. Here is the description of the NFs:
 
 \begin{table}[t]
 \centering
@@ -75,43 +83,26 @@ ChaCha20 (w/ LU)  &     3,965        & 356\\ \hline
 \end{tabular}}
 \end{table}
 
-\textcolor{red}{The first application forwards frames from one interface to another. There is no learning involved, the output ports are hard-coded. Using the iperf tool, UDP connections are created between terminals A and B. Figure %~\ref{fig:07result} 
-shows the UDP goodput per packet size. This experiment evaluates what is the maximum obtained goodput.}
+\textbf{Return:} is the simplest application. It forwards packets to a port and serves as a performance baseline. 
 
-The second example is an IPv4 router. When eBPFlow receives a frame, it checks if the frame is an Ethernet frame and if it contains an IPv4 packet. It extracts the IPv4 destination and searches the TCAM for the output port. The available actions are to forward the packet or drop it. Figure %~\ref{fig:IPv4routerresult} 
-shows the goodput for UDP flow with packets of 1472 bytes.
+\textbf{Wire:} acts as wire connecting adjacent ports in pairs of two. It performs an XOR operation between the input port value and 1, which flips the least significant bit. This value sets the packet's output port.
 
-%\begin{figure}[htb]
-%\centering
-%\includegraphics[width=1.\linewidth]{figures/ipv4goodput.png}
-%\includegraphics[width=1.\linewidth]{figures/throughputxbytes.png}
-%\caption{UDP Goodput for IPv4 router.}
-%\label{fig:IPv4routerresult}
-%\end{figure}
+\textbf{L2 Learning Switch:} a functional learning switch capable of forwarding Ethernet frames based on values learned on demand and stored on the CAM.
 
-% \begin{table}[htb]
-% \centering
-% \begin{tabular}{|c|c|}
-% \hline
-% Number of Flows & Goodput (Mbps) \\
-% \hline
-% 1 & 541 $\pm$ 4.9 \\
-% \hline
-% 2 & 539 $\pm$ 13.99 \\
-% \hline
-% \end{tabular}
-% \caption{UDP Goodput for IPv4 router.}
-% \label{tab:IPv4routerresult}
-% \end{table}
+% The advantage of a protocol-independent switch is that it only needs to parse the frame header fields for the protocols defined by the programmer. In this example, the parser only needs to parse Ethernet headers, while a protocol-dependent switch would process other frame or packet header fields. CAM (exact-match) lookup table stores the Ethernet MAC address and the input port. 
+% For each input frame, if the source address is unicast, the code can self-populate the lookup table by updating it. This second advantage can reduce network traffic, latency, and CPU controller overhead. Using the destination MAC, the output port is searched. If there is an entry, then the packet is forwarded otherwise there are two options. It can be flooded or sent to the controller. In this experiment, we opted to flood.
 
-The third application is an L2 learning switch. The advantage of a protocol-independent switch is that it only needs to parse the frame header fields for the protocols defined by the programmer. In this example, the parser only needs to parse Ethernet headers while protocol-dependent switch would process other frame or packet header fields. CAM (exact-match) lookup table stores the Ethernet MAC address and the input port. 
-For each input frame, if the source address is unicast, the code can self-populate the lookup table by updating it. This second advantage can reduce network traffic, latency, and CPU controller overhead. Using the destination MAC, the output port is searched. If there is an entry, then the packet is forwarded otherwise there are two options. It can be flooded or sent to the controller. In this experiment, we opted to flood.
+\textbf{IPv4 Router:} route packets using the NetFPGA's TCAM module, effectively speeding up costly longest prefix matching operations. 
+
+\textbf{DDoS Mitigation:} mitigate DDoS attacks by analyzing and dropping potentially dangerous packets on demand~\cite{Bertin2017}.
+
+\textbf{NAT (Network Address Translation):} modifies packets and stores flow state. Several CAM entries were used to store flow address information to translate inbound and outbound packets.
 
 %Não tenho esssa informação. 
 %The code is installed through the NetFPGA register interface. The time to read or write one register in this interface is 500 us. Each eBPF instruction (64 bits) utilizes two registers (32 bits). To start the code installation, it requires 2 write operations.
 %Thus, the time to install a code is given by:\\Time to install code $=$ (number of instructions+2) $* 500 us * 2.$ 
 
-In the last experiment, eBPFlow starts as IPv4 router. During runtime, we install the learning switch. This experiment validates the system by showing that the switch executes these instructions for each received packet, allowing a data plane with dynamic parse, matching, and actions at run time with zero downtime.
+% In the last experiment, eBPFlow starts as IPv4 router. During runtime, we install the learning switch. This experiment validates the system by showing that the switch executes these instructions for each received packet, allowing a data plane with dynamic parse, matching, and actions at run time with zero downtime.
 
 \textbf{ChaCha:} 
 ChaCha20~\cite{rfc8439} network function is a
@@ -123,56 +114,93 @@ We tried to implement it on the Netronome Agilio CX 1x40 Gbps SmartNIC but it ca
 But, \system is able to execute ChaCha20.
 
 \subsection{Zero downtime}
+\label{sec:downtime}
 
-\textcolor{red}{In this experiment, we evaluate instruction memory DBS to demonstrate that the loading eBPF programs in runtime no affect eBPFlow's throughput. We valid this experiment loading the DDoS mitigation program again on time 5 s (Figure~\ref{fig:zerodowntime}). To ensure that it was installed at a different instruction memory, we added a register to store the ID of the instruction memory that the eBPF program was loaded. Figure~\ref{fig:zerodowntime} demonstrates that the change between eBPF programs no cause packets loss after the installation of another eBPF program.}
+We evaluated the system capability to modify parsing, matching, and actions at run time with zero downtime using the DBS instruction memory. Figure~\ref{fig:zerodowntime} shows the throughput (in Mpps) before, during, and after loading new eBPF program. We send a constant rate of 1024 B packets at 10 Gbps and switch the processor's program during runtime. Before the experiment begins, the processor is loaded with the DDoS mitigation program on one of the instruction memories. At $t=5$ s, a different DDoS mitigation program is loaded, representing an update on the mitigation policy informed by the centralized controller. 
+%A special register stores the ID of the current instruction memory in use and, whose value is shown in Figure~\ref{fig:zerodowntime}. After the switch the new program's instructions are successfully stored on the second instruction memory and.
+No packets are dropped in this process, showing zero downtime.
 
-\begin{figure}[ht]
+% To ensure the new was installed at a different instruction memory, a special register was added to store the ID of the current instruction memory in use. Figure~\ref{fig:zerodowntime} demonstrates that the change between eBPF programs no cause packets loss after the installation of another eBPF program.
+
+\begin{figure}[th]
 \centering
-\includegraphics[width=.8\linewidth]{figures/zerodowntime.png}
-\caption{Zero downtime using DDoS Mitigation.}
+\includegraphics[width=.75\linewidth]{figures/zero_downtime.png}
+\caption{Zero downtime using DDoS Mitigation NF.}
 \label{fig:zerodowntime}
 \end{figure}
 
-\subsection{Throughput}
+\subsection{Performance}
+\label{sec:performance}
 
-\begin{figure}[ht]
+\begin{figure}[th]
 \centering
-\includegraphics[width=\columnwidth]{figures/throughput_mpps_64B.pdf}
+\includegraphics[width=.85\linewidth]{figures/throughput_mpps_64B.pdf}
 \caption{Packet processing rates (in Mpps) with minimum-sized (64 bytes) packets.}
 \label{fig:throughput64}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[th]
 \centering
-\includegraphics[width=1.\linewidth]{figures/throughput_gbps_1500B.pdf}
+\includegraphics[width=.85\linewidth]{figures/throughput_gbps_1500B.pdf}
 \caption{Throughput (in Gbps) with packets of 1500 bytes.}
 \label{fig:throughput1500}
 \end{figure}
 
-\begin{figure}[ht]
+Figure~\ref{fig:throughput64} summarizes the measured packet processing rates of minimium-sized (64 bytes) packets with many NFs in Mpps for one interface (as in~\cite{FlowBlaze2019}). As discussed in Figure~\ref{fig:Comparison}, there is a trade-off between flexibility and performance.
+We have quantified this trade-off. Figure~\ref{fig:throughput1500} shows eBPFlow's achieved throughput when processing packets of 1500 bytes. Wire and Return programs achieve the highest rate in both cases for their simplicity and low number of instructions. Figure~\ref{fig:throughput1500} shows that almost all examples are capable of maximum line rate with 1500 B packets, NAT being an exception with at approximately 8 Gbps, which performs 3 CAM lookups, thus being more computationally expensive than the other examples.
+
+% This decrease in performance is caused by the cost of packet copies done inside the packet processing pipeline. It becomes specially acute for small packets (64 B) because of the very short time between packet arrivals, which leaves little slack for the processor to finish processing the previous packet. 
+
+\begin{figure}[th]
 \centering
-\includegraphics[width=1.\linewidth]{figures/payload-1500B.pdf}
-\caption{Throughput with payload signal enabled and disabled to packets 1500 bytes.}
+\includegraphics[width=.85\columnwidth]{figures/payload-1500B.pdf}
+\caption{Throughput with and without enabling payload processing.}
 \label{fig:payload-1500B}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[th]
 \centering
-\includegraphics[width=1.\linewidth]{figures/throughput_chacha.pdf}
-\caption{Throughput ChaCha8 and ChaCha20.}
-\label{fig:latency}
+\includegraphics[width=.8\linewidth]{figures/throughput_chacha.pdf}
+\caption{Throughput for ChaCha8 and ChaCha20 examples}
+\label{fig:chacha}
 \end{figure}
 
-%\subsection{Latency}
+As describe in \textsection\ref{secsec:actions}, the controller can decides if the device should process the entire packet or just the headers (like dRMT~\cite{chole2017drmt} does). 
+%The controller sends a signal that enables or disables the processing of the packet's payload on eBPFlow's.
+This optimization allows processing the payload only for NFs that need it (e.g., ChaCha8 and ChaCha20).
+To demonstrate the difference in performance obtained with this optimization, the same set of experiment was executed (1500 B packets at 10 Gbps) in two different scenarios: with and without payload processing. Figure~\ref{fig:payload-1500B} presents the throughput in Gbps for each of the example NFs. 
+Hatched bars represent programs executed with payload signal enabled, while plain bars indicate processing without the payload. 
+%Packets of 1500 bytes were used in this experiment since they represent the standard MTU used by most networks. 
+When the payload signal is enabled, all NFs decreases their throughput since there is an overhead to transfer the payload.
+%To improve eBPFlow's throughput performance even further it's necessary add support for zero copy processing.
 
-\begin{figure}[ht]
+
+
+Figure~\ref{fig:chacha} presents the results for ChaCha8 and ChaCha20 with packet sizes of 64 and 1500 bytes. These NFs present better performance for minimum-sized packets since they process the payload.
+%On the other hand, processing bigger packets come at a high cost as shown by the low throughput achieved with 1500-byte packets. 
+Although at a low rate, eBPFlow is the only platform capable of running ChaCha20, whereas other platforms like P4, Netronome eBPF, FlowBaze cannot.
+
+
+
+\subsection{Latency}
+
+Figure~\ref{fig:latency} shows the latency for each NF. They were collected using \textit{pktgen}.
+% In addition to throughput measurements, \textit{pktgen}'s builtin support for latency measurement was used to evaluate the average latency for each use case, which is shown in Figure~\ref{fig:latency}. All measurements were taken with at a rate of 1 Gbps. 
+As expected, latency increased with the number of instructions (see Table \ref{tbl:example-sizes}), since the processor will take more time to run the entire program. Measurements for ChaCha8 and Chacha20 were not included due to an incompatibility with \textit{pktgen}. The tool uses the packet's payload to store metadata used to estimate latency. Since these two applications encrypt the payload, \textit{pktgen} was not able to retrieve the metadata at the RX port.
+
+The latency profile shown by the NAT is due to a combination of queueing, processing delays and accessing CAM. For small packet sizes the NAT's processing delay causes eBPFlow's input queues to grow, since the packet arrival rate is high. As the packet size increases, this rate gets smaller, reducing the queueing effect. However, starting at 1024 B, the effect of moving payload inside the processing pipeline starts to rule the total, and the average latency grows again.
+%This behavior is expected since the actual time to process the instructions is the same for all packets sizes as the NAT only touches a few fields in the packet headers, however queieing and copying delays have different influences on packet sizes.
+
+\begin{figure}[th]
 \centering
-\includegraphics[width=1.\linewidth]{figures/latency.pdf}
-\caption{Average latency ranging packet size.}
+\includegraphics[width=\columnwidth]{figures/latency.pdf}
+\caption{Average latency for different packet sizes and NFs.}
 \label{fig:latency}
 \end{figure}
 
 \subsection{Power}
+\label{sec:power}
+
 
 When idle, the NetFPGA consumes 16 W.
 When eBPFlow is loaded, the power consumption is 22 W independent of the packet rate or what programming is running.
